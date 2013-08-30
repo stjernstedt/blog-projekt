@@ -4,18 +4,17 @@ import javax.persistence.EntityManager;
 
 import data.User;
 
-public class UserMapper {
+public class UserManager {
 	
 	private static DatabaseConnection connection;
+	private static UserManager userManager = new UserManager();
 	
-	private static UserMapper userMapper = new UserMapper();
-	
-	private UserMapper() {
+	private UserManager() {
 		connection = DatabaseConnection.getInstance();
 	}
 	
-	public static UserMapper getInstance() {
-		return userMapper;
+	public static UserManager getInstance() {
+		return userManager;
 	}
 	
 	public User createUser(User user) {
