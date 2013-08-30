@@ -7,14 +7,14 @@ public class Core {
 	
 	public void createUser(String username, String password, String email,int usertype) {
 		User user = new User();
-		UserManager usermapper = UserManager.getInstance();
+		UserManager userManager = UserManager.getInstance();
 		
 		user.setUsername(username);
 		user.setPassword(password);
 		user.setEmail(email);
 		user.setUsertype(usertype);
 		
-		usermapper.createUser(user);
+		userManager.createUser(user);
 	}
 	
 	public void removeUser(int id) {
