@@ -1,5 +1,8 @@
 package core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import data.User;
 import db.UserManager;
 
@@ -19,6 +22,12 @@ public class Core {
 	
 	public void removeUser(int id) {
 		
+	}
+	
+	public List<User> getUsers() {
+		UserManager userManager = UserManager.getInstance();
+		
+		return userManager.getUsers();
 	}
 	
 	public void login() {
