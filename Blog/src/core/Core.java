@@ -1,12 +1,17 @@
 package core;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import data.Post;
 import data.User;
 import db.UserManager;
 
 public class Core {
+	
+	public String test(String s1) {
+		String result = s1+" success";
+		return result;
+	}
 	
 	public void createUser(String username, String password, String email,int usertype) {
 		User user = new User();
@@ -30,19 +35,21 @@ public class Core {
 		return userManager.getUsers();
 	}
 	
-	public void login() {
+	public long login(String userName, String Password) {
+		return 0;
 		
 	}
 	
-	public void logout() {
+	public void logout(long sessionsId) {
 		
 	}
 	
-	public void createPost() {
+	public Post createPost(long sessionsId) {
+		return null;
 		
 	}
 	
-	public void removePost() {
+	public void removePost(long sessionId, Post post) {
 		
 	}
 	
