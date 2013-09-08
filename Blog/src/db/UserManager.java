@@ -31,8 +31,8 @@ public class UserManager {
 		} finally {
 			if (em.getTransaction().isActive())
 				em.getTransaction().rollback();
+			em.close();
 		}
-		em.close();
 
 		return user;
 	}
