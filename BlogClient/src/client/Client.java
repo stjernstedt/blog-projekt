@@ -4,10 +4,12 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
+import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -19,8 +21,11 @@ import org.apache.axis2.AxisFault;
 
 import core.CoreStub;
 import core.CoreStub.CreateUser;
+import core.CoreStub.GetUsers;
+import core.CoreStub.GetUsersResponse;
 import core.CoreStub.Test;
 import core.CoreStub.TestResponse;
+import core.CoreStub.User;
 
 public class Client implements ActionListener {
 
@@ -37,12 +42,15 @@ public class Client implements ActionListener {
 	private TextField textField2 = new TextField(15);
 	private TextField textField3 = new TextField(15);
 
+	TextArea usersBox = new TextArea(10, 40);
+
 	private String[] choices = {"Admin", "User", "Guest"};
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private JComboBox combobox = new JComboBox(choices);
 
 	private JButton button1 = new JButton("Create User");
 	private JButton CUbutton = new JButton("Create User");
+	private JButton GUbutton = new JButton("Get Users");
 
 	public static void main(String[] args) {
 
@@ -66,9 +74,13 @@ public class Client implements ActionListener {
 
 		mainContent.setLayout(emf);
 		mainContent.add(button1);
+		mainContent.add(GUbutton);
+		mainContent.add(usersBox);
 
 		button1.addActionListener(this);
 		button1.setActionCommand("openCU");
+		GUbutton.addActionListener(this);
+		GUbutton.setActionCommand("getUsers");
 
 		// window.pack();
 		window.setVisible(true);
@@ -101,6 +113,21 @@ public class Client implements ActionListener {
 		}
 
 		return answer.get_return();
+	}
+	
+	private User[] getUsers() {
+		GetUsers arg = new GetUsers();
+		GetUsersResponse result = null;
+		
+		try {
+			result = server.getUsers(arg);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			System.err.println(e.getLocalizedMessage());
+			System.exit(-2);
+		}
+		
+		return result.get_return();
 	}
 
 	private void createUser(String username, String password, String email,
@@ -173,10 +200,21 @@ public class Client implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if ("openCU".equals(e.getActionCommand()))
 			createUserWindow();
+		
 		if ("createUser".equals(e.getActionCommand())) {
 			createUser(textField1.getText(), textField2.getText(), textField3.getText(), combobox.getSelectedIndex());
 			CUWindow.dispose();
 			JOptionPane.showMessageDialog(null, "User created!");
+		}
+		
+		if("getUsers".equals(e.getActionCommand())) {
+			User[] users = getUsers();
+			String string = "";
+			
+			for (User user : users) {
+				string = string+user.getUserId()+" "+user.getUsername()+" "+user.getEmail()+"\n";
+			}
+			usersBox.setText(string);
 		}
 	}
 
