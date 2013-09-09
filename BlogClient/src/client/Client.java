@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,6 +21,7 @@ import javax.swing.JOptionPane;
 import org.apache.axis2.AxisFault;
 
 import core.CoreStub;
+import core.CoreStub.CreatePost;
 import core.CoreStub.CreateUser;
 import core.CoreStub.GetUsers;
 import core.CoreStub.GetUsersResponse;
@@ -32,26 +34,30 @@ public class Client implements ActionListener {
 	private CoreStub server = null;
 
 	private JFrame window = new JFrame("Blog Admin");
+	private JFrame CPWindow;
 	private JFrame CUWindow;
-	
+
 	private Container mainContent = window.getContentPane();
-	private LayoutManager emf = new GridBagLayout();
+	private LayoutManager lm = new GridBagLayout();
 	private GridBagConstraints c = new GridBagConstraints();
-	
+
 	private TextField textField1 = new TextField(15);
 	private TextField textField2 = new TextField(15);
 	private TextField textField3 = new TextField(15);
+	private TextField CPtitle = new TextField(15);
 
-	TextArea usersBox = new TextArea(10, 40);
+	private TextArea usersBox = new TextArea(10, 40);
+	private TextArea CPpostBox = new TextArea(20, 80);
 
-	private String[] choices = {"Admin", "User", "Guest"};
+	private String[] choices = { "Admin", "User", "Guest" };
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private JComboBox combobox = new JComboBox(choices);
 
 	private JButton button1 = new JButton("Create User");
+	private JButton button2 = new JButton("Create Post");
 	private JButton CUbutton = new JButton("Create User");
 	private JButton GUbutton = new JButton("Get Users");
-	
+	private JButton CPbutton = new JButton("Post");
 
 	public static void main(String[] args) {
 
@@ -65,26 +71,27 @@ public class Client implements ActionListener {
 	}
 
 	/**
-	 * Metoden start() är det nya main(String[] args)
+	 * Metoden start() Ã¤r det nya main(String[] args)
 	 */
 	public void start() {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setSize(500, 300);
-		window.setLocationRelativeTo(null); // centrerar fönstret
+		window.setSize(600, 400);
+		window.setLocationRelativeTo(null); // centrerar fÃ¶nstret
 		window.setResizable(false);
 
-		mainContent.setLayout(emf);
+		mainContent.setLayout(lm);
 		mainContent.add(button1);
 		mainContent.add(GUbutton);
 		mainContent.add(usersBox);
+		mainContent.add(button2);
 
 		button1.addActionListener(this);
 		button1.setActionCommand("openCU");
 		GUbutton.addActionListener(this);
 		GUbutton.setActionCommand("getUsers");
-		
+		button2.addActionListener(this);
+		button2.setActionCommand("openCP");
 		CUbutton.addActionListener(this);
-
 
 		// window.pack();
 		window.setVisible(true);
@@ -103,26 +110,10 @@ public class Client implements ActionListener {
 		return server;
 	}
 
-	private String test(String s1) {
-		Test arg = new Test();
-		arg.setS1(s1);
-
-		TestResponse answer = null;
-		try {
-			answer = server.test(arg);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			System.err.println(e.getLocalizedMessage());
-			System.exit(-2);
-		}
-
-		return answer.get_return();
-	}
-	
 	private User[] getUsers() {
 		GetUsers arg = new GetUsers();
 		GetUsersResponse result = null;
-		
+
 		try {
 			result = server.getUsers(arg);
 		} catch (RemoteException e) {
@@ -130,7 +121,7 @@ public class Client implements ActionListener {
 			System.err.println(e.getLocalizedMessage());
 			System.exit(-2);
 		}
-		
+
 		return result.get_return();
 	}
 
@@ -150,6 +141,21 @@ public class Client implements ActionListener {
 
 	}
 
+	private void createPost(String title, String text, Date date, int userId) {
+		CreatePost post = new CreatePost();
+		post.setDate(date);
+		post.setText(text);
+		post.setTitle(title);
+		post.setUserId(userId);
+
+		try {
+			server.createPost(post);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	private void createUserWindow() {
 		CUWindow = new JFrame("Create User");
 		Container CUcontent = CUWindow.getContentPane();
@@ -158,12 +164,12 @@ public class Client implements ActionListener {
 		JLabel label2 = new JLabel("Password:");
 		JLabel label3 = new JLabel("Email:");
 		JLabel label4 = new JLabel("Usertype:");
-		
+
 		CUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		CUWindow.setSize(400, 200);
 		CUWindow.setLocationRelativeTo(null);
 		CUWindow.setResizable(false);
-		CUWindow.setLayout(emf);
+		CUWindow.setLayout(lm);
 
 		c.weightx = 0.5;
 		c.weighty = 0.5;
@@ -199,23 +205,59 @@ public class Client implements ActionListener {
 		CUWindow.setVisible(true);
 	}
 
+	private void createPostWindow() {
+		CPWindow = new JFrame("Create Post");
+		Container CPcontent = CPWindow.getContentPane();
+
+		CPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		CPWindow.setSize(1000, 500);
+		CPWindow.setLocationRelativeTo(null);
+		CPWindow.setResizable(false);
+		CPWindow.setLayout(lm);
+
+		JLabel CPlabel1 = new JLabel("Title");
+		JLabel CPlabel2 = new JLabel("Text");
+
+		c.gridx = 0;
+		c.gridy = 0;
+		CPcontent.add(CPlabel1, c);
+		c.gridy = 1;
+		CPcontent.add(CPlabel2, c);
+
+		c.gridx = 1;
+		c.gridy = 0;
+		CPcontent.add(CPtitle, c);
+		c.gridy = 1;
+		CPcontent.add(CPpostBox, c);
+
+		c.gridy = 2;
+		CPcontent.add(CPbutton, c);
+		
+		CPWindow.setVisible(true);
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if ("openCU" == e.getActionCommand())
+		if ("openCU".equals(e.getActionCommand()))
 			createUserWindow();
-		
-		if ("createUser" == e.getActionCommand()) {
-			createUser(textField1.getText(), textField2.getText(), textField3.getText(), combobox.getSelectedIndex());
+
+		if ("openCP".equals(e.getActionCommand()))
+			createPostWindow();
+
+		if ("createUser".equals(e.getActionCommand())) {
+			createUser(textField1.getText(), textField2.getText(),
+					textField3.getText(), combobox.getSelectedIndex());
 			CUWindow.dispose();
 			JOptionPane.showMessageDialog(null, "User created!");
 		}
-		
-		if("getUsers" == e.getActionCommand()) {
+
+		if ("getUsers".equals( e.getActionCommand())) {
 			User[] users = getUsers();
 			String string = "";
-			
+
 			for (User user : users) {
-				string = string+user.getUserId()+" "+user.getUsername()+" "+user.getEmail()+"\n";
+				string = string + user.getUserId() + " " + user.getUsername()
+						+ " " + user.getEmail() + "\n";
 			}
 			usersBox.setText(string);
 		}

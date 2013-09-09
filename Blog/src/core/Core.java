@@ -1,11 +1,13 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
 import data.Post;
 import data.User;
+import db.PostManager;
 import db.UserManager;
 
 public class Core {
@@ -54,8 +56,17 @@ public class Core {
 
 	}
 
-	public Post createPost(long sessionsId) {
-		return null;
+	public void createPost(String title, String text, Date date, int userId) {
+		Post post = new Post();
+		PostManager postManager = PostManager.getInstance();
+		
+		post.setTitle(title);
+		post.setDate(date);
+		post.setText(text);
+		post.setUserId(userId);
+		
+		postManager.createPost(post);
+		
 
 	}
 
