@@ -51,6 +51,7 @@ public class Client implements ActionListener {
 	private JButton button1 = new JButton("Create User");
 	private JButton CUbutton = new JButton("Create User");
 	private JButton GUbutton = new JButton("Get Users");
+	
 
 	public static void main(String[] args) {
 
@@ -81,6 +82,9 @@ public class Client implements ActionListener {
 		button1.setActionCommand("openCU");
 		GUbutton.addActionListener(this);
 		GUbutton.setActionCommand("getUsers");
+		
+		CUbutton.addActionListener(this);
+
 
 		// window.pack();
 		window.setVisible(true);
@@ -161,7 +165,7 @@ public class Client implements ActionListener {
 		CUWindow.setResizable(false);
 		CUWindow.setLayout(emf);
 
-		c.weightx = 0.1;
+		c.weightx = 0.5;
 		c.weighty = 0.5;
 		c.gridx = 0;
 		c.gridy = 0;
@@ -186,10 +190,9 @@ public class Client implements ActionListener {
 
 		c.gridx = 2;
 		c.gridy = 4;
-		c.weightx = 0.5;
+		c.weightx = 0.1;
 		c.weighty = 1;
 
-		CUbutton.addActionListener(this);
 		CUbutton.setActionCommand("createUser");
 		CUcontent.add(CUbutton, c);
 
@@ -198,16 +201,16 @@ public class Client implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if ("openCU".equals(e.getActionCommand()))
+		if ("openCU" == e.getActionCommand())
 			createUserWindow();
 		
-		if ("createUser".equals(e.getActionCommand())) {
+		if ("createUser" == e.getActionCommand()) {
 			createUser(textField1.getText(), textField2.getText(), textField3.getText(), combobox.getSelectedIndex());
 			CUWindow.dispose();
 			JOptionPane.showMessageDialog(null, "User created!");
 		}
 		
-		if("getUsers".equals(e.getActionCommand())) {
+		if("getUsers" == e.getActionCommand()) {
 			User[] users = getUsers();
 			String string = "";
 			
