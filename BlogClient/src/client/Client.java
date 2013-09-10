@@ -66,6 +66,7 @@ public class Client implements ActionListener {
 		// System.exit(0);
 	}
 
+	
 	private Client() {
 		server = initializeServer();
 	}
@@ -248,6 +249,9 @@ public class Client implements ActionListener {
 			createUser(textField1.getText(), textField2.getText(),
 					textField3.getText(), combobox.getSelectedIndex());
 			CUWindow.dispose();
+			textField1.setText("");
+			textField2.setText("");
+			textField3.setText("");
 			JOptionPane.showMessageDialog(null, "User created!");
 		}
 
