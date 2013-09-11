@@ -43,7 +43,7 @@ public class UserManager {
 
 		em.getTransaction().begin();
 		try {
-			TypedQuery<User> q = em.createQuery("SELECT User from User user",
+			TypedQuery<User> q = em.createQuery("SELECT User FROM User user",
 					User.class);
 
 			allUsers = q.getResultList();
@@ -54,5 +54,24 @@ public class UserManager {
 			em.close();
 		}
 		return allUsers;
+	}
+
+	public User getUser(String username) {
+		EntityManager em = connection.getEntityManager();
+		User user;
+
+		em.getTransaction().begin();
+		try {
+			TypedQuery<User> q = em.createQuery(
+					"SELECT User FROM User user WHERE username = :username",
+					User.class);
+			user = q.getSingleResult();
+			em.getTransaction().commit();
+		} finally {
+			if (em.getTransaction().isActive())
+				em.getTransaction().rollback();
+			em.close();
+		}
+		return user;
 	}
 }

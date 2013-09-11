@@ -3,9 +3,11 @@ package core;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import data.Post;
+import data.Session;
 import data.User;
 import db.PostManager;
 import db.UserManager;
@@ -47,9 +49,17 @@ public class Core {
 		return result;
 	}
 
-	public long login(String userName, String Password) {
-		return 0;
-
+	public UUID login(String username, String password) {
+		UserManager userManager = UserManager.getInstance();
+		
+		User user = userManager.getUser(username);
+		if(user.getPassword() == password) {
+			Session session = new Session();
+			UUID sessID = session.getSessID();
+			return sessID;
+		}
+		
+		return null;
 	}
 
 	public void logout(long sessionsId) {

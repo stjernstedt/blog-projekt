@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -25,6 +26,8 @@ import core.CoreStub.CreatePost;
 import core.CoreStub.CreateUser;
 import core.CoreStub.GetUsers;
 import core.CoreStub.GetUsersResponse;
+import core.CoreStub.Login;
+import core.CoreStub.LoginResponse;
 import core.CoreStub.Test;
 import core.CoreStub.TestResponse;
 import core.CoreStub.User;
@@ -55,6 +58,7 @@ public class Client implements ActionListener {
 
 	private JButton button1 = new JButton("Create User");
 	private JButton button2 = new JButton("Create Post");
+	private JButton button3 = new JButton("Login");
 	private JButton CUbutton = new JButton("Create User");
 	private JButton GUbutton = new JButton("Get Users");
 	private JButton CPbutton = new JButton("Post");
@@ -72,12 +76,12 @@ public class Client implements ActionListener {
 	}
 
 	/**
-	 * Metoden start() Ã¤r det nya main(String[] args)
+	 * Metoden start() Är det nya main(String[] args)
 	 */
 	public void start() {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setSize(600, 400);
-		window.setLocationRelativeTo(null); // centrerar fÃ¶nstret
+		window.setLocationRelativeTo(null); // centrerar fönstret
 		window.setResizable(false);
 
 		mainContent.setLayout(lm);
@@ -85,6 +89,7 @@ public class Client implements ActionListener {
 		mainContent.add(GUbutton);
 		mainContent.add(usersBox);
 		mainContent.add(button2);
+		mainContent.add(button3);
 
 		button1.addActionListener(this);
 		button1.setActionCommand("openCU");
@@ -92,6 +97,9 @@ public class Client implements ActionListener {
 		GUbutton.setActionCommand("getUsers");
 		button2.addActionListener(this);
 		button2.setActionCommand("openCP");
+		button3.addActionListener(this);
+		button3.setActionCommand("login");
+		
 		CUbutton.addActionListener(this);
 
 		// window.pack();
@@ -109,6 +117,22 @@ public class Client implements ActionListener {
 			System.exit(-1);
 		}
 		return server;
+	}
+	
+	private String login(String username, String password) {
+		Login arg = new Login();
+		LoginResponse result = null;
+		arg.setUsername(username);
+		arg.setPassword(password);
+		
+		try {
+			result = server.login(arg);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			System.err.println(e.getLocalizedMessage());
+			System.exit(-2);
+		}
+		return result.get_return().toString();
 	}
 
 	private User[] getUsers() {
@@ -244,6 +268,9 @@ public class Client implements ActionListener {
 
 		if ("openCP".equals(e.getActionCommand()))
 			createPostWindow();
+		
+		if ("login".equals(e.getActionCommand()))
+			JOptionPane.showMessageDialog(null, login("kalle", "kalle"));
 
 		if ("createUser".equals(e.getActionCommand())) {
 			createUser(textField1.getText(), textField2.getText(),
