@@ -49,17 +49,19 @@ public class Core {
 		return result;
 	}
 
-	public UUID login(String username, String password) {
+	public String login(String username, String password) {
 		UserManager userManager = UserManager.getInstance();
 		
+		logg.info(username+" "+password);
 		User user = userManager.getUser(username);
-		if(user.getPassword() == password) {
+		logg.info("stored password: "+user.getPassword()+"  user password: "+ password);
+		if(user.getPassword().equals(password)) {
 			Session session = new Session();
 			UUID sessID = session.getSessID();
-			return sessID;
+			return sessID.toString();
+		} else {
+			return "error";
 		}
-		
-		return null;
 	}
 
 	public void logout(long sessionsId) {

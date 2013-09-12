@@ -3,6 +3,7 @@ package client;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.TextArea;
 import java.awt.TextField;
@@ -18,6 +19,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.apache.axis2.AxisFault;
 
@@ -132,7 +134,7 @@ public class Client implements ActionListener {
 			System.err.println(e.getLocalizedMessage());
 			System.exit(-2);
 		}
-		return result.get_return().toString();
+		return result.get_return();
 	}
 
 	private User[] getUsers() {
@@ -235,14 +237,16 @@ public class Client implements ActionListener {
 		Container CPcontent = CPWindow.getContentPane();
 
 		CPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		CPWindow.setSize(1000, 500);
+		CPWindow.setSize(800, 500);
 		CPWindow.setLocationRelativeTo(null);
 		CPWindow.setResizable(false);
 		CPWindow.setLayout(lm);
 
 		JLabel CPlabel1 = new JLabel("Title");
 		JLabel CPlabel2 = new JLabel("Text");
-
+		
+		c.weightx = 0.5;
+		c.weighty = 0.1;
 		c.gridx = 0;
 		c.gridy = 0;
 		CPcontent.add(CPlabel1, c);
@@ -254,7 +258,10 @@ public class Client implements ActionListener {
 		CPcontent.add(CPtitle, c);
 		c.gridy = 1;
 		CPcontent.add(CPpostBox, c);
-
+		
+		c.anchor = GridBagConstraints.LINE_END;
+		c.insets = new Insets(0, 0, 0, 50);
+		c.weightx = 0.1;
 		c.gridy = 2;
 		CPcontent.add(CPbutton, c);
 		
