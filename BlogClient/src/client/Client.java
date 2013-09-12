@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import org.apache.axis2.AxisFault;
 
 import core.CoreStub;
+import core.CoreStub.CreateComment;
 import core.CoreStub.CreatePost;
 import core.CoreStub.CreateUser;
 import core.CoreStub.GetUsers;
@@ -70,7 +71,6 @@ public class Client implements ActionListener {
 		// System.exit(0);
 	}
 
-	
 	private Client() {
 		server = initializeServer();
 	}
@@ -99,8 +99,9 @@ public class Client implements ActionListener {
 		button2.setActionCommand("openCP");
 		button3.addActionListener(this);
 		button3.setActionCommand("login");
-		
+
 		CUbutton.addActionListener(this);
+		CPbutton.addActionListener(this);
 
 		// window.pack();
 		window.setVisible(true);
@@ -118,13 +119,13 @@ public class Client implements ActionListener {
 		}
 		return server;
 	}
-	
+
 	private String login(String username, String password) {
 		Login arg = new Login();
 		LoginResponse result = null;
 		arg.setUsername(username);
 		arg.setPassword(password);
-		
+
 		try {
 			result = server.login(arg);
 		} catch (RemoteException e) {
@@ -166,19 +167,34 @@ public class Client implements ActionListener {
 
 	}
 
-	private void createPost(String title, String text, Date date, int userId) {
+	private void createPost(String title, String text) {
 		CreatePost post = new CreatePost();
-		post.setDate(date);
+		//post.setDate(date);
 		post.setText(text);
 		post.setTitle(title);
-		post.setUserId(userId);
+		//post.setUserId(userId);
 
 		try {
 			server.createPost(post);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+	}
 
+	private void createComment(String email, String text, String name,
+			Date date, int userID) {
+		CreateComment comment = new CreateComment();
+		comment.setEmail(email);
+		comment.setName(name);
+		comment.setText(text);
+		comment.setDate(date);
+		comment.setUserID(userID);
+
+		try {
+			server.createComment(comment);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void createUserWindow() {
@@ -258,6 +274,9 @@ public class Client implements ActionListener {
 		c.gridy = 2;
 		CPcontent.add(CPbutton, c);
 		
+		CPbutton.setActionCommand("createPost");
+		CPcontent.add(CPbutton, c);
+
 		CPWindow.setVisible(true);
 	}
 
@@ -268,7 +287,7 @@ public class Client implements ActionListener {
 
 		if ("openCP".equals(e.getActionCommand()))
 			createPostWindow();
-		
+
 		if ("login".equals(e.getActionCommand()))
 			JOptionPane.showMessageDialog(null, login("kalle", "kalle"));
 
@@ -281,8 +300,16 @@ public class Client implements ActionListener {
 			textField3.setText("");
 			JOptionPane.showMessageDialog(null, "User created!");
 		}
+		
+		if ("createPost".equals(e.getActionCommand())) {
+			createPost(CPtitle.getText(), CPpostBox.getText());
+			CPWindow.dispose();
+			CPtitle.setText("");
+			CPpostBox.setText("");
+			JOptionPane.showMessageDialog(null, "Post created!");		}
+		
 
-		if ("getUsers".equals( e.getActionCommand())) {
+		if ("getUsers".equals(e.getActionCommand())) {
 			User[] users = getUsers();
 			String string = "";
 

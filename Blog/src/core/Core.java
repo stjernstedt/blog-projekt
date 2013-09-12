@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import data.Comment;
 import data.Post;
 import data.Session;
 import data.User;
+import db.CommentManager;
 import db.PostManager;
 import db.UserManager;
 
@@ -66,14 +68,14 @@ public class Core {
 
 	}
 
-	public void createPost(String title, String text, Date date, int userId) {
+	public void createPost(String title, String text) {
 		Post post = new Post();
 		PostManager postManager = PostManager.getInstance();
 		
 		post.setTitle(title);
-		post.setDate(date);
+		//post.setDate(date);
 		post.setText(text);
-		post.setUserId(userId);
+		//post.setUserId(userId);
 		
 		postManager.createPost(post);
 		
@@ -82,6 +84,18 @@ public class Core {
 
 	public void removePost(long sessionId, Post post) {
 
+	}
+	
+	public void createComment(String email, String text, String name, Date date, int userID) {
+		Comment comment = new Comment();
+		CommentManager commentManager = CommentManager.getInstance();
+		
+		comment.setEmail(email);
+		comment.setName(name);
+		comment.setText(text);
+		comment.setUserId(userID);
+		
+		commentManager.createComment(comment);
 	}
 
 }
