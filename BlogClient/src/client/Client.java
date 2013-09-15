@@ -5,21 +5,24 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.awt.TextArea;
-import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
+import java.security.MessageDigest;
 import java.util.Date;
-import java.util.UUID;
+import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 
 import org.apache.axis2.AxisFault;
 
@@ -31,29 +34,36 @@ import core.CoreStub.GetUsers;
 import core.CoreStub.GetUsersResponse;
 import core.CoreStub.Login;
 import core.CoreStub.LoginResponse;
-import core.CoreStub.Test;
-import core.CoreStub.TestResponse;
 import core.CoreStub.User;
 
 public class Client implements ActionListener {
 
+	private Logger logg = Logger.getLogger("Client Logger");
 	private CoreStub server = null;
+	private String session;
 
 	private JFrame window = new JFrame("Blog Admin");
 	private JFrame CPWindow;
 	private JFrame CUWindow;
+	private JFrame loginWindow;
+
+	private Border border = BorderFactory
+			.createEtchedBorder(EtchedBorder.LOWERED);
 
 	private Container mainContent = window.getContentPane();
 	private LayoutManager lm = new GridBagLayout();
 	private GridBagConstraints c = new GridBagConstraints();
 
-	private TextField textField1 = new TextField(15);
-	private TextField textField2 = new TextField(15);
-	private TextField textField3 = new TextField(15);
-	private TextField CPtitle = new TextField(15);
+	private JTextField textField1 = new JTextField(15);
+	private JTextField textField2 = new JTextField(15);
+	private JTextField textField3 = new JTextField(15);
+	private JTextField CPtitle = new JTextField(80);
+	private JTextField loginUsername = new JTextField(15);
 
-	private TextArea usersBox = new TextArea(10, 40);
-	private TextArea CPpostBox = new TextArea(20, 80);
+	private JPasswordField loginPassword = new JPasswordField(15);
+
+	private JTextArea usersBox = new JTextArea(10, 40);
+	private JTextArea CPpostBox = new JTextArea(20, 80);
 
 	private String[] choices = { "Admin", "User", "Guest" };
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -65,6 +75,7 @@ public class Client implements ActionListener {
 	private JButton CUbutton = new JButton("Create User");
 	private JButton GUbutton = new JButton("Get Users");
 	private JButton CPbutton = new JButton("Post");
+	private JButton loginButton = new JButton("Login");
 
 	public static void main(String[] args) {
 
@@ -82,10 +93,9 @@ public class Client implements ActionListener {
 	 */
 	public void start() {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setSize(600, 400);
-		window.setLocationRelativeTo(null); // centrerar fönstret
 		window.setResizable(false);
 
+		usersBox.setBorder(border);
 		mainContent.setLayout(lm);
 		mainContent.add(button1);
 		mainContent.add(GUbutton);
@@ -100,12 +110,13 @@ public class Client implements ActionListener {
 		button2.addActionListener(this);
 		button2.setActionCommand("openCP");
 		button3.addActionListener(this);
-		button3.setActionCommand("login");
+		button3.setActionCommand("openLogin");
 
 		CUbutton.addActionListener(this);
 		CPbutton.addActionListener(this);
 
-		// window.pack();
+		window.pack();
+		window.setLocationRelativeTo(null); // centrerar fönstret
 		window.setVisible(true);
 
 	}
@@ -122,12 +133,18 @@ public class Client implements ActionListener {
 		return server;
 	}
 
-	private String login(String username, String password) {
+	private String login(String username, char[] password) {
 		Login arg = new Login();
 		LoginResponse result = null;
+		String pwd = "";
+		
+		for (char c : password) {
+			pwd += c;
+		}
+		
 		arg.setUsername(username);
-		arg.setPassword(password);
-
+		arg.setPassword(pwd);
+		
 		try {
 			result = server.login(arg);
 		} catch (RemoteException e) {
@@ -171,10 +188,10 @@ public class Client implements ActionListener {
 
 	private void createPost(String title, String text) {
 		CreatePost post = new CreatePost();
-		//post.setDate(date);
+		// post.setDate(date);
 		post.setText(text);
 		post.setTitle(title);
-		//post.setUserId(userId);
+		// post.setUserId(userId);
 
 		try {
 			server.createPost(post);
@@ -209,11 +226,11 @@ public class Client implements ActionListener {
 		JLabel label4 = new JLabel("Usertype:");
 
 		CUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		CUWindow.setSize(400, 200);
-		CUWindow.setLocationRelativeTo(null);
 		CUWindow.setResizable(false);
 		CUWindow.setLayout(lm);
 
+		resetConstraints();
+		c.insets = new Insets(5, 5, 5, 5);
 		c.weightx = 0.5;
 		c.weighty = 0.5;
 		c.gridx = 0;
@@ -245,6 +262,8 @@ public class Client implements ActionListener {
 		CUbutton.setActionCommand("createUser");
 		CUcontent.add(CUbutton, c);
 
+		CUWindow.pack();
+		CUWindow.setLocationRelativeTo(null);
 		CUWindow.setVisible(true);
 	}
 
@@ -253,14 +272,16 @@ public class Client implements ActionListener {
 		Container CPcontent = CPWindow.getContentPane();
 
 		CPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		CPWindow.setSize(800, 500);
-		CPWindow.setLocationRelativeTo(null);
 		CPWindow.setResizable(false);
 		CPWindow.setLayout(lm);
 
+		CPpostBox.setBorder(border);
+
 		JLabel CPlabel1 = new JLabel("Title");
 		JLabel CPlabel2 = new JLabel("Text");
-		
+
+		resetConstraints();
+		c.insets = new Insets(5, 5, 5, 5);
 		c.weightx = 0.5;
 		c.weighty = 0.1;
 		c.gridx = 0;
@@ -274,17 +295,68 @@ public class Client implements ActionListener {
 		CPcontent.add(CPtitle, c);
 		c.gridy = 1;
 		CPcontent.add(CPpostBox, c);
-		
+
 		c.anchor = GridBagConstraints.LINE_END;
-		c.insets = new Insets(0, 0, 0, 50);
+		// c.insets = new Insets(0, 0, 0, 50);
 		c.weightx = 0.1;
 		c.gridy = 2;
 		CPcontent.add(CPbutton, c);
-		
+
 		CPbutton.setActionCommand("createPost");
 		CPcontent.add(CPbutton, c);
 
+		CPWindow.pack();
+		CPWindow.setLocationRelativeTo(null);
 		CPWindow.setVisible(true);
+	}
+
+	private void loginWindow() {
+		loginWindow = new JFrame("Login");
+		Container loginContent = loginWindow.getContentPane();
+
+		loginWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		loginWindow.setResizable(false);
+		loginWindow.setLayout(lm);
+
+		JLabel loginLabel1 = new JLabel("Username:");
+		JLabel loginlabel2 = new JLabel("Password:");
+
+		resetConstraints();
+		c.insets = new Insets(5, 5, 5, 5);
+		c.weightx = 0.5;
+		c.weighty = 0.5;
+		c.gridx = 0;
+		c.gridy = 0;
+		loginContent.add(loginLabel1, c);
+		c.gridy = 1;
+		loginContent.add(loginlabel2, c);
+
+		c.weightx = 1;
+		c.weighty = 1;
+		c.gridx = 1;
+		c.gridy = 0;
+		loginContent.add(loginUsername, c);
+		c.gridy = 1;
+		loginContent.add(loginPassword, c);
+
+		c.anchor = GridBagConstraints.LINE_END;
+		c.gridy = 2;
+		loginContent.add(loginButton, c);
+		loginButton.addActionListener(this);
+		loginButton.setActionCommand("login");
+
+		loginWindow.pack();
+		loginWindow.setLocationRelativeTo(null);
+		loginWindow.setVisible(true);
+	}
+
+	private void resetConstraints() {
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 0;
+		c.weighty = 0;
+		c.insets = new Insets(0, 0, 0, 0);
+		c.anchor = 10;
 	}
 
 	@Override
@@ -295,8 +367,8 @@ public class Client implements ActionListener {
 		if ("openCP".equals(e.getActionCommand()))
 			createPostWindow();
 
-		if ("login".equals(e.getActionCommand()))
-			JOptionPane.showMessageDialog(null, login("kalle", "kalle"));
+		if ("openLogin".equals(e.getActionCommand()))
+			loginWindow();
 
 		if ("createUser".equals(e.getActionCommand())) {
 			createUser(textField1.getText(), textField2.getText(),
@@ -307,14 +379,19 @@ public class Client implements ActionListener {
 			textField3.setText("");
 			JOptionPane.showMessageDialog(null, "User created!");
 		}
-		
+
 		if ("createPost".equals(e.getActionCommand())) {
 			createPost(CPtitle.getText(), CPpostBox.getText());
 			CPWindow.dispose();
 			CPtitle.setText("");
 			CPpostBox.setText("");
-			JOptionPane.showMessageDialog(null, "Post created!");		}
+			JOptionPane.showMessageDialog(null, "Post created!");
+		}
 		
+		if ("login".equals(e.getActionCommand())){
+			session = login(loginUsername.getText(), loginPassword.getPassword());
+			JOptionPane.showMessageDialog(null, session);
+		}
 
 		if ("getUsers".equals(e.getActionCommand())) {
 			User[] users = getUsers();
