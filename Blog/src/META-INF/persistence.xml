@@ -4,5 +4,7 @@
 		<class>data.Post</class>
 		<class>data.User</class>
 		<class>data.Comment</class>
+		<class>data.Session</class>
+		<class>data.Blog</class>
 	</persistence-unit>
 </persistence>
