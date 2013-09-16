@@ -11,6 +11,8 @@ import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.logging.Logger;
+import javax.swing.*;
+import java.awt.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -46,6 +48,7 @@ public class Client implements ActionListener {
 	private JFrame CPWindow;
 	private JFrame CUWindow;
 	private JFrame loginWindow;
+	private JFrame EUWindow;
 
 	private Border border = BorderFactory
 			.createEtchedBorder(EtchedBorder.LOWERED);
@@ -68,7 +71,9 @@ public class Client implements ActionListener {
 	private String[] choices = { "Admin", "User", "Guest" };
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private JComboBox combobox = new JComboBox(choices);
-
+	
+	private JButton EditUser = new JButton("Edit User");
+	private JButton EditPost = new JButton("Edit Post");
 	private JButton button1 = new JButton("Create User");
 	private JButton button2 = new JButton("Create Post");
 	private JButton button3 = new JButton("Login");
@@ -76,7 +81,6 @@ public class Client implements ActionListener {
 	private JButton GUbutton = new JButton("Get Users");
 	private JButton CPbutton = new JButton("Post");
 	private JButton loginButton = new JButton("Login");
-
 	public static void main(String[] args) {
 
 		Client client = new Client();
@@ -97,12 +101,33 @@ public class Client implements ActionListener {
 
 		usersBox.setBorder(border);
 		mainContent.setLayout(lm);
-		mainContent.add(button1);
-		mainContent.add(GUbutton);
-		mainContent.add(usersBox);
-		mainContent.add(button2);
-		mainContent.add(button3);
-
+				
+		mainContent.add(EditUser, c);
+		c.gridy = 1;
+		mainContent.add(EditPost, c);
+		c.gridy = 0;
+		c.gridx = 2;
+		mainContent.add(button1, c);
+		c.gridy = 1;
+		mainContent.add(GUbutton, c);
+		c.gridx = 1;
+		c.gridy = 1;
+		//mainContent.add(usersBox, c);
+		mainContent.add(button2, c);
+		c.gridx = 1;
+		c.gridy = 0;
+		mainContent.add(button3, c);
+		
+		
+		
+		button1.setPreferredSize(new Dimension(150, 25));
+		button2.setPreferredSize(new Dimension(150, 25));
+		button3.setPreferredSize(new Dimension(150, 25));
+		GUbutton.setPreferredSize(new Dimension(150, 25));
+		EditUser.setPreferredSize(new Dimension(150, 25));
+		EditPost.setPreferredSize(new Dimension(150, 25));
+		
+		
 		button1.addActionListener(this);
 		button1.setActionCommand("openCU");
 		GUbutton.addActionListener(this);
@@ -111,6 +136,8 @@ public class Client implements ActionListener {
 		button2.setActionCommand("openCP");
 		button3.addActionListener(this);
 		button3.setActionCommand("openLogin");
+		EditUser.addActionListener(this);
+		EditUser.setActionCommand("openEU");
 
 		CUbutton.addActionListener(this);
 		CPbutton.addActionListener(this);
@@ -214,6 +241,21 @@ public class Client implements ActionListener {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void editUserWindow() {
+		EUWindow = new JFrame("Edit User");
+		Container EUcontent = EUWindow.getContentPane();
+		
+		
+		EUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		EUWindow.setResizable(false);
+		EUWindow.setLayout(lm);		
+		
+		
+		EUWindow.pack();
+		EUWindow.setVisible(true);
+		
 	}
 
 	private void createUserWindow() {
@@ -369,6 +411,9 @@ public class Client implements ActionListener {
 
 		if ("openLogin".equals(e.getActionCommand()))
 			loginWindow();
+		
+		if ("openEU".equals(e.getActionCommand()))
+			editUserWindow();
 
 		if ("createUser".equals(e.getActionCommand())) {
 			createUser(textField1.getText(), textField2.getText(),
