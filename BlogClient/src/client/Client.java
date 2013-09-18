@@ -49,8 +49,8 @@ public class Client implements ActionListener {
 	private JFrame CPWindow;
 	private JFrame CUWindow;
 	private JFrame loginWindow;
-	private JFrame EUWindow;
-	private JFrame EPWindow;
+	private JFrame MUWindow;
+	private JFrame MPWindow;
 	private JFrame GUWindow;
 
 	private Border border = BorderFactory
@@ -75,8 +75,8 @@ public class Client implements ActionListener {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private JComboBox combobox = new JComboBox(choices);
 	
-	private JButton EditUser = new JButton("Manage User");
-	private JButton EditPost = new JButton("Manage Post");
+	private JButton manageUser = new JButton("Manage User");
+	private JButton managePost = new JButton("Manage Post");
 	private JButton button1 = new JButton("Create User");
 	private JButton button2 = new JButton("Create Post");
 	private JButton removePost = new JButton("Remove Post");
@@ -107,17 +107,19 @@ public class Client implements ActionListener {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
 		resetConstraints();
-
+		
+		c.insets = new Insets(5, 5, 5, 5);
+		
 		usersBox.setBorder(border);
 		mainContent.setLayout(lm);
 		
 		mainContent.add(button3, c);
 		c.gridy = 1;
-		mainContent.add(EditPost, c);
+		mainContent.add(managePost, c);
 //		mainContent.add(usersBox, c);
 		c.gridx = 0;
 		c.gridy = 2;
-		mainContent.add(EditUser, c);
+		mainContent.add(manageUser, c);
 		
 		
 		// Sätter storleken på knapparna, ska fixa variabel för detta
@@ -125,8 +127,8 @@ public class Client implements ActionListener {
 		button2.setPreferredSize(new Dimension(150, 25));
 		button3.setPreferredSize(new Dimension(150, 25));
 		GUbutton.setPreferredSize(new Dimension(150, 25));
-		EditUser.setPreferredSize(new Dimension(150, 25));
-		EditPost.setPreferredSize(new Dimension(150, 25));
+		manageUser.setPreferredSize(new Dimension(150, 25));
+		managePost.setPreferredSize(new Dimension(150, 25));
 		removeUser.setPreferredSize(new Dimension(150, 25));
 		updateUser.setPreferredSize(new Dimension(150, 25));
 		removePost.setPreferredSize(new Dimension(150, 25));
@@ -141,10 +143,10 @@ public class Client implements ActionListener {
 		button2.setActionCommand("openCP");
 		button3.addActionListener(this);
 		button3.setActionCommand("openLogin");
-		EditUser.addActionListener(this);
-		EditUser.setActionCommand("openEU");
-		EditPost.addActionListener(this);
-		EditPost.setActionCommand("openEP");
+		manageUser.addActionListener(this);
+		manageUser.setActionCommand("openEU");
+		managePost.addActionListener(this);
+		managePost.setActionCommand("openEP");
 
 		CUbutton.addActionListener(this);
 		CPbutton.addActionListener(this);
@@ -251,50 +253,52 @@ public class Client implements ActionListener {
 	}
 	
 	private void editUserWindow() {
-		EUWindow = new JFrame("Manage User");
-		Container EUcontent = EUWindow.getContentPane();
+		MUWindow = new JFrame("Manage User");
+		Container MUcontent = MUWindow.getContentPane();
 		resetConstraints();
 		
-		EUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		EUWindow.setResizable(false);
-		EUWindow.setLayout(lm);	
+		MUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		MUWindow.setResizable(false);
+		MUWindow.setLayout(lm);
 		
-		EUcontent.add(button1, c);
+		c.insets = new Insets(5, 5, 5, 5);
+		MUcontent.add(button1, c);
 		c.gridy = 1;
-		EUcontent.add(removeUser, c);
+		MUcontent.add(removeUser, c);
 		c.gridy = 2;
-		EUcontent.add(updateUser, c);
+		MUcontent.add(updateUser, c);
 		c.gridy = 3;
-		EUcontent.add(GUbutton, c);
+		MUcontent.add(GUbutton, c);
 		
-		EUWindow.setLocationRelativeTo(null);
-		EUWindow.pack();
-		EUWindow.setVisible(true);
+		MUWindow.setLocationRelativeTo(null);
+		MUWindow.pack();
+		MUWindow.setVisible(true);
 		
 	}
 	
 	private void editPostWindow() {
-		EPWindow = new JFrame("Manage Post");
-		Container EPcontent = EPWindow.getContentPane();
+		MPWindow = new JFrame("Manage Post");
+		Container MPcontent = MPWindow.getContentPane();
 		resetConstraints();
 		
-		EPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		EPWindow.setResizable(false);
-		EPWindow.setLayout(lm);	
+		MPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		MPWindow.setResizable(false);
+		MPWindow.setLayout(lm);	
 		
-		EPcontent.add(button2, c);
+		c.insets = new Insets(5, 5, 5, 5);
+		MPcontent.add(button2, c);
 		c.gridy = 1;
-		EPcontent.add(removePost, c);
+		MPcontent.add(removePost, c);
 		c.gridy = 2;
-		EPcontent.add(updatePost, c);
+		MPcontent.add(updatePost, c);
 		
-		EPWindow.setLocationRelativeTo(null);
-		EPWindow.pack();
-		EPWindow.setVisible(true);
+		MPWindow.setLocationRelativeTo(null);
+		MPWindow.pack();
+		MPWindow.setVisible(true);
 		
 	}
 	
-	private void getUserWindow() {
+	private void getUsersWindow() {
 		GUWindow = new JFrame("Get User");
 		Container GUcontent = GUWindow.getContentPane();
 		resetConstraints();
@@ -303,7 +307,9 @@ public class Client implements ActionListener {
 		GUWindow.setResizable(false);
 		GUWindow.setLayout(lm);	
 		
+		
 		GUcontent.add(usersBox, c);
+		
 		
 		
 		GUbutton.setActionCommand("getUsers");
@@ -457,6 +463,7 @@ public class Client implements ActionListener {
 		c.anchor = 10;
 	}
 	
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -474,8 +481,9 @@ public class Client implements ActionListener {
 		
 		if ("openEP".equals(e.getActionCommand()))
 			editPostWindow();
+		
 		if ("openGU".equals(e.getActionCommand()))
-			getUserWindow();
+			getUsersWindow();
 
 		if ("createUser".equals(e.getActionCommand())) {
 			createUser(textField1.getText(), textField2.getText(),
@@ -503,7 +511,8 @@ public class Client implements ActionListener {
 		if ("getUsers".equals(e.getActionCommand())) {
 			User[] users = getUsers();
 			String string = "";
-
+			getUsersWindow();
+			
 			for (User user : users) {
 				string = string + user.getUserId() + " " + user.getUsername()
 						+ " " + user.getEmail() + "\n";
