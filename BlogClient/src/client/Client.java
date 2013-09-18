@@ -487,6 +487,14 @@ public class Client implements ActionListener {
 			JFrame test = new JFrame("test");
 			test.setLayout(lm);
 			Container cont = test.getContentPane();
+			JPanel pane = new JPanel();
+			pane.setLayout(lm);
+
+			JScrollPane scroll = new JScrollPane(pane);
+			pane.setAutoscrolls(true);
+			scroll.setPreferredSize(new Dimension(500, 700));
+			scroll.getVerticalScrollBar().setUnitIncrement(10);
+			test.add(scroll);
 			
 			ArrayList<JTextField> fields = new ArrayList<JTextField>();
 			ArrayList<JTextArea> areas = new ArrayList<JTextArea>();
@@ -496,18 +504,18 @@ public class Client implements ActionListener {
 			c.gridx = 0;
 			c.gridy = 0;
 			for (Post post : posts) {
-				fields.add(new JTextField("test", 40));
+				fields.add(new JTextField(post.getTitle(), 43));
 				fields.get(i).setEditable(false);
 				
-				areas.add(new JTextArea(post.getText(), 20, 40));
+				areas.add(new JTextArea(post.getText(), 20, 43));
 				areas.get(i).setEditable(false);
 				c.gridy += 1;
-				cont.add(fields.get(i), c);
+				pane.add(fields.get(i), c);
 				c.gridy += 2;
-				cont.add(areas.get(i), c);
+				pane.add(areas.get(i), c);
 				i++;
 			}
-
+			
 			test.pack();
 			test.setLocationRelativeTo(null);
 			test.setVisible(true);
