@@ -25,6 +25,7 @@ public class UserManager {
 		return userManager;
 	}
 
+	//sparar en användare i databasen
 	public User createUser(User user) {
 		EntityManager em = connection.getEntityManager();
 		em.getTransaction().begin();
@@ -41,6 +42,7 @@ public class UserManager {
 		return user;
 	}
 
+	//hämtar alla användare från databasen
 	public List<User> getUsers() {
 		EntityManager em = connection.getEntityManager();
 		List<User> allUsers = new ArrayList<User>();
@@ -60,6 +62,7 @@ public class UserManager {
 		return allUsers;
 	}
 
+	//hämtar en specifik användare
 	public User getUser(String name) {
 		EntityManager em = connection.getEntityManager();
 		User user = null;

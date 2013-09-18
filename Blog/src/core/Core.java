@@ -18,11 +18,7 @@ public class Core {
 
 	private Logger logg = Logger.getLogger("Core Logger");
 
-	public String test(String s1) {
-		String result = s1 + " success";
-		return result;
-	}
-
+	//skapar en användare
 	public void createUser(String username, String password, String email,
 			int usertype) {
 		User user = new User();
@@ -40,17 +36,28 @@ public class Core {
 
 	}
 
+	//hämtar alla användare
 	public List<User> getUsers() {
 		UserManager userManager = UserManager.getInstance();
 
 		List<User> result = new ArrayList<User>();
 
 		result = userManager.getUsers();
-		result.toArray();
 
 		return result;
 	}
+	
+	public List<Post> getPosts() {
+		PostManager postManager = PostManager.getInstance();
+		
+		List<Post> result = new ArrayList<Post>();
+		
+		result = postManager.getPosts();
+		
+		return result;
+	}
 
+	//login metod
 	public String login(String username, String password) {
 		UserManager userManager = UserManager.getInstance();
 		
@@ -70,6 +77,7 @@ public class Core {
 
 	}
 
+	//skapar ett inlägg
 	public void createPost(String title, String text) {
 		Post post = new Post();
 		PostManager postManager = PostManager.getInstance();
@@ -88,6 +96,7 @@ public class Core {
 
 	}
 	
+	//skapar en kommentar
 	public void createComment(String email, String text, String name, Date date, int userID) {
 		Comment comment = new Comment();
 		CommentManager commentManager = CommentManager.getInstance();

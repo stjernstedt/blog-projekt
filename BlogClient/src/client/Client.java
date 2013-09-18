@@ -9,9 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Logger;
+
 import javax.swing.*;
+
 import java.awt.*;
 
 import javax.swing.BorderFactory;
@@ -21,10 +24,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
+
+import managers.CommentManager;
+import managers.PostManager;
+import managers.UserManager;
 
 import org.apache.axis2.AxisFault;
 
@@ -36,6 +44,7 @@ import core.CoreStub.GetUsers;
 import core.CoreStub.GetUsersResponse;
 import core.CoreStub.Login;
 import core.CoreStub.LoginResponse;
+import core.CoreStub.Post;
 import core.CoreStub.User;
 
 public class Client implements ActionListener {
@@ -43,6 +52,9 @@ public class Client implements ActionListener {
 	private Logger logg = Logger.getLogger("Client Logger");
 	private CoreStub server = null;
 	private String session;
+	private PostManager pm = new PostManager();
+	private UserManager um = new UserManager();
+	private CommentManager cm = new CommentManager();
 	
 
 	private JFrame window = new JFrame("Blog Admin");
@@ -88,6 +100,8 @@ public class Client implements ActionListener {
 	private JButton GUbutton = new JButton("Get Users");
 	private JButton CPbutton = new JButton("Post");
 	private JButton loginButton = new JButton("Login");
+	private JButton showPosts = new JButton("Show Posts");
+	
 	public static void main(String[] args) {
 
 		Client client = new Client();
@@ -169,6 +183,7 @@ public class Client implements ActionListener {
 		return server;
 	}
 
+	// login metod
 	private String login(String username, char[] password) {
 		Login arg = new Login();
 		LoginResponse result = null;
@@ -191,67 +206,7 @@ public class Client implements ActionListener {
 		return result.get_return();
 	}
 
-	private User[] getUsers() {
-		GetUsers arg = new GetUsers();
-		GetUsersResponse result = null;
-
-		try {
-			result = server.getUsers(arg);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			System.err.println(e.getLocalizedMessage());
-			System.exit(-2);
-		}
-
-		return result.get_return();
-	}
-
-	private void createUser(String username, String password, String email,
-			int usertype) {
-		CreateUser user = new CreateUser();
-		user.setEmail(email);
-		user.setPassword(password);
-		user.setUsername(username);
-		user.setUsertype(usertype);
-
-		try {
-			server.createUser(user);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	private void createPost(String title, String text) {
-		CreatePost post = new CreatePost();
-		// post.setDate(date);
-		post.setText(text);
-		post.setTitle(title);
-		// post.setUserId(userId);
-
-		try {
-			server.createPost(post);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void createComment(String email, String text, String name,
-			Date date, int userID) {
-		CreateComment comment = new CreateComment();
-		comment.setEmail(email);
-		comment.setName(name);
-		comment.setText(text);
-		comment.setDate(date);
-		comment.setUserID(userID);
-
-		try {
-			server.createComment(comment);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-	
+	// hantera användare fönstret
 	private void editUserWindow() {
 		MUWindow = new JFrame("Manage User");
 		Container MUcontent = MUWindow.getContentPane();
@@ -276,6 +231,7 @@ public class Client implements ActionListener {
 		
 	}
 	
+	// hantera inlägg fönstret
 	private void editPostWindow() {
 		MPWindow = new JFrame("Manage Post");
 		Container MPcontent = MPWindow.getContentPane();
@@ -291,6 +247,11 @@ public class Client implements ActionListener {
 		MPcontent.add(removePost, c);
 		c.gridy = 2;
 		MPcontent.add(updatePost, c);
+		c.gridy = 3;
+		MPcontent.add(showPosts, c);
+		
+		showPosts.addActionListener(this);
+		showPosts.setActionCommand("showPosts");
 		
 		MPWindow.setLocationRelativeTo(null);
 		MPWindow.pack();
@@ -298,6 +259,7 @@ public class Client implements ActionListener {
 		
 	}
 	
+	// skapar ett fönster som kan visa användare
 	private void getUsersWindow() {
 		GUWindow = new JFrame("Get User");
 		Container GUcontent = GUWindow.getContentPane();
@@ -307,10 +269,7 @@ public class Client implements ActionListener {
 		GUWindow.setResizable(false);
 		GUWindow.setLayout(lm);	
 		
-		
 		GUcontent.add(usersBox, c);
-		
-		
 		
 		GUbutton.setActionCommand("getUsers");
 		GUWindow.setLocationRelativeTo(null);
@@ -319,7 +278,7 @@ public class Client implements ActionListener {
 		
 	}
 	
-
+	// skapar fönstret för att skapa användare
 	private void createUserWindow() {
 		CUWindow = new JFrame("Create User");
 		Container CUcontent = CUWindow.getContentPane();
@@ -371,6 +330,7 @@ public class Client implements ActionListener {
 		CUWindow.setVisible(true);
 	}
 
+	//skapar fönstret för att göra inlägg
 	private void createPostWindow() {
 		CPWindow = new JFrame("Create Post");
 		Container CPcontent = CPWindow.getContentPane();
@@ -414,6 +374,7 @@ public class Client implements ActionListener {
 		CPWindow.setVisible(true);
 	}
 
+	//skapar login fönster
 	private void loginWindow() {
 		loginWindow = new JFrame("Login");
 		Container loginContent = loginWindow.getContentPane();
@@ -454,6 +415,7 @@ public class Client implements ActionListener {
 		loginWindow.setVisible(true);
 	}
 
+	//återställer alla GridBagConstraints
 	private void resetConstraints() {
 		c.gridx = 0;
 		c.gridy = 0;
@@ -486,7 +448,7 @@ public class Client implements ActionListener {
 			getUsersWindow();
 
 		if ("createUser".equals(e.getActionCommand())) {
-			createUser(textField1.getText(), textField2.getText(),
+			um.createUser(server, textField1.getText(), textField2.getText(),
 					textField3.getText(), combobox.getSelectedIndex());
 			CUWindow.dispose();
 			textField1.setText("");
@@ -496,7 +458,7 @@ public class Client implements ActionListener {
 		}
 
 		if ("createPost".equals(e.getActionCommand())) {
-			createPost(CPtitle.getText(), CPpostBox.getText());
+			pm.createPost(server, CPtitle.getText(), CPpostBox.getText());
 			CPWindow.dispose();
 			CPtitle.setText("");
 			CPpostBox.setText("");
@@ -509,7 +471,7 @@ public class Client implements ActionListener {
 		}
 
 		if ("getUsers".equals(e.getActionCommand())) {
-			User[] users = getUsers();
+			User[] users = um.getUsers(server);
 			String string = "";
 			getUsersWindow();
 			
@@ -518,6 +480,37 @@ public class Client implements ActionListener {
 						+ " " + user.getEmail() + "\n";
 			}
 			usersBox.setText(string);
+		}
+		
+		if("showPosts".equals(e.getActionCommand())) {
+			Post[] posts = pm.getPosts(server);
+			JFrame test = new JFrame("test");
+			test.setLayout(lm);
+			Container cont = test.getContentPane();
+			
+			ArrayList<JTextField> fields = new ArrayList<JTextField>();
+			ArrayList<JTextArea> areas = new ArrayList<JTextArea>();
+			
+			int i = 0;
+			resetConstraints();
+			c.gridx = 0;
+			c.gridy = 0;
+			for (Post post : posts) {
+				fields.add(new JTextField("test", 40));
+				fields.get(i).setEditable(false);
+				
+				areas.add(new JTextArea(post.getText(), 20, 40));
+				areas.get(i).setEditable(false);
+				c.gridy += 1;
+				cont.add(fields.get(i), c);
+				c.gridy += 2;
+				cont.add(areas.get(i), c);
+				i++;
+			}
+
+			test.pack();
+			test.setLocationRelativeTo(null);
+			test.setVisible(true);
 		}
 	}
 
