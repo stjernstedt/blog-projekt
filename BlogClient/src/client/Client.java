@@ -10,17 +10,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -28,8 +24,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
@@ -91,11 +85,11 @@ public class Client implements ActionListener {
 	private JButton button1 = new JButton("Create User");
 	private JButton button2 = new JButton("Create Post");
 	private JButton removePost = new JButton("Remove Post");
-	private JButton updatePost = new JButton("Update Post");
+	private JButton updatePost = new JButton("Edit Posts");
 	private JButton button3 = new JButton("Login");
 	private JButton CUbutton = new JButton("Create User");
 	private JButton removeUser = new JButton("Remove User");
-	private JButton updateUser = new JButton("Update User");
+	private JButton updateUser = new JButton("Edit User");
 	private JButton GUbutton = new JButton("Get Users");
 	private JButton CPbutton = new JButton("Post");
 	private JButton loginButton = new JButton("Login");
@@ -220,10 +214,8 @@ public class Client implements ActionListener {
 		c.insets = new Insets(5, 5, 5, 5);
 		MUcontent.add(button1, c);
 		c.gridy = 1;
-		MUcontent.add(removeUser, c);
-		c.gridy = 2;
 		MUcontent.add(updateUser, c);
-		c.gridy = 3;
+		c.gridy = 2;
 		MUcontent.add(GUbutton, c);
 
 		MUWindow.setLocationRelativeTo(null);
@@ -298,7 +290,11 @@ public class Client implements ActionListener {
 
 		pane.add(scrollPane);
 		GUcontent.add(pane, c);
-
+		
+		c.insets = new Insets(0, 348, 5, 0);
+		c.gridy = 1;
+		GUcontent.add(removeUser, c);
+		
 		GUbutton.setActionCommand("getUsers");
 		GUWindow.setLocationRelativeTo(null);
 		GUWindow.pack();
