@@ -32,8 +32,9 @@ public class Core {
 		userManager.createUser(user);
 	}
 
-	public void removeUser(int id) {
-
+	public void removeUser(String name) {
+		UserManager userManager = UserManager.getInstance();
+		userManager.removeUser(name);
 	}
 
 	//hämtar alla användare

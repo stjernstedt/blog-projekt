@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
@@ -82,5 +83,21 @@ public class UserManager {
 			logg.info("User: "+user);
 		}
 		return user;
+	}
+	
+	//tar bort en användare
+	public void removeUser(String name) {
+		EntityManager em = connection.getEntityManager();
+		
+		em.getTransaction().begin();
+		User user = em.find(User.class, getUser(name).getUserId());
+		try {
+			em.remove(user);
+			em.getTransaction().commit();
+		} finally {
+			if (em.getTransaction().isActive())
+				em.getTransaction().rollback();
+			em.close();
+		}
 	}
 }

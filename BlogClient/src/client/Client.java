@@ -10,19 +10,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
@@ -36,6 +43,7 @@ import core.CoreStub;
 import core.CoreStub.Login;
 import core.CoreStub.LoginResponse;
 import core.CoreStub.Post;
+import core.CoreStub.RemoveUser;
 import core.CoreStub.User;
 
 public class Client implements ActionListener {
@@ -46,7 +54,6 @@ public class Client implements ActionListener {
 	private PostManager pm = new PostManager();
 	private UserManager um = new UserManager();
 	private CommentManager cm = new CommentManager();
-	
 
 	private JFrame window = new JFrame("Blog Admin");
 	private JFrame CPWindow;
@@ -68,6 +75,7 @@ public class Client implements ActionListener {
 	private JTextField textField3 = new JTextField(15);
 	private JTextField CPtitle = new JTextField(80);
 	private JTextField loginUsername = new JTextField(15);
+	private JTextField delUserField = new JTextField(15);
 
 	private JPasswordField loginPassword = new JPasswordField(15);
 
@@ -77,9 +85,9 @@ public class Client implements ActionListener {
 	private String[] choices = { "Admin", "User", "Guest" };
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private JComboBox combobox = new JComboBox(choices);
-	
-	private JButton manageUser = new JButton("Manage User");
-	private JButton managePost = new JButton("Manage Post");
+
+	private JButton manageUser = new JButton("Manage Users");
+	private JButton managePost = new JButton("Manage Posts");
 	private JButton button1 = new JButton("Create User");
 	private JButton button2 = new JButton("Create Post");
 	private JButton removePost = new JButton("Remove Post");
@@ -92,7 +100,7 @@ public class Client implements ActionListener {
 	private JButton CPbutton = new JButton("Post");
 	private JButton loginButton = new JButton("Login");
 	private JButton showPosts = new JButton("Show Posts");
-	
+
 	public static void main(String[] args) {
 
 		Client client = new Client();
@@ -108,25 +116,27 @@ public class Client implements ActionListener {
 	 * Metoden start() Är det nya main(String[] args)
 	 */
 	public void start() {
-		
+
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
 		resetConstraints();
-		
+
 		c.insets = new Insets(5, 5, 5, 5);
-		
+
 		usersBox.setBorder(border);
 		mainContent.setLayout(lm);
-		
+
 		mainContent.add(button3, c);
 		c.gridy = 1;
 		mainContent.add(managePost, c);
-//		mainContent.add(usersBox, c);
+		// mainContent.add(usersBox, c);
 		c.gridx = 0;
 		c.gridy = 2;
 		mainContent.add(manageUser, c);
-		
-		
+		c.gridy = 3;
+		mainContent.add(delUserField);
+		c.gridy = 4;
+
 		// Sätter storleken på knapparna
 		Dimension knappDim = new Dimension(150, 25);
 		button1.setPreferredSize(knappDim);
@@ -139,8 +149,7 @@ public class Client implements ActionListener {
 		updateUser.setPreferredSize(knappDim);
 		removePost.setPreferredSize(knappDim);
 		updatePost.setPreferredSize(knappDim);
-		
-		
+
 		button1.addActionListener(this);
 		button1.setActionCommand("openCU");
 		GUbutton.addActionListener(this);
@@ -152,7 +161,7 @@ public class Client implements ActionListener {
 		manageUser.addActionListener(this);
 		manageUser.setActionCommand("openEU");
 		managePost.addActionListener(this);
-		managePost.setActionCommand("openEP");
+		managePost.setActionCommand("deleteUser");
 
 		CUbutton.addActionListener(this);
 		CPbutton.addActionListener(this);
@@ -180,14 +189,14 @@ public class Client implements ActionListener {
 		Login arg = new Login();
 		LoginResponse result = null;
 		String pwd = "";
-		
+
 		for (char c : password) {
 			pwd += c;
 		}
-		
+
 		arg.setUsername(username);
 		arg.setPassword(pwd);
-		
+
 		try {
 			result = server.login(arg);
 		} catch (RemoteException e) {
@@ -203,11 +212,11 @@ public class Client implements ActionListener {
 		MUWindow = new JFrame("Manage User");
 		Container MUcontent = MUWindow.getContentPane();
 		resetConstraints();
-		
+
 		MUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		MUWindow.setResizable(false);
 		MUWindow.setLayout(lm);
-		
+
 		c.insets = new Insets(5, 5, 5, 5);
 		MUcontent.add(button1, c);
 		c.gridy = 1;
@@ -216,23 +225,23 @@ public class Client implements ActionListener {
 		MUcontent.add(updateUser, c);
 		c.gridy = 3;
 		MUcontent.add(GUbutton, c);
-		
+
 		MUWindow.setLocationRelativeTo(null);
 		MUWindow.pack();
 		MUWindow.setVisible(true);
-		
+
 	}
-	
+
 	// hantera inlägg fönstret
 	private void editPostWindow() {
 		MPWindow = new JFrame("Manage Post");
 		Container MPcontent = MPWindow.getContentPane();
 		resetConstraints();
-		
+
 		MPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		MPWindow.setResizable(false);
-		MPWindow.setLayout(lm);	
-		
+		MPWindow.setLayout(lm);
+
 		c.insets = new Insets(5, 5, 5, 5);
 		MPcontent.add(button2, c);
 		c.gridy = 1;
@@ -241,35 +250,62 @@ public class Client implements ActionListener {
 		MPcontent.add(updatePost, c);
 		c.gridy = 3;
 		MPcontent.add(showPosts, c);
-		
+
 		showPosts.addActionListener(this);
 		showPosts.setActionCommand("showPosts");
-		
+
 		MPWindow.setLocationRelativeTo(null);
 		MPWindow.pack();
 		MPWindow.setVisible(true);
-		
+
 	}
-	
+
 	// skapar ett fönster som kan visa användare
 	private void getUsersWindow() {
 		GUWindow = new JFrame("Get User");
 		Container GUcontent = GUWindow.getContentPane();
+		JPanel pane = new JPanel();
 		resetConstraints();
+
+		User[] users = um.getUsers(server);
+		String[] columnNames = {"UserID", "Username", "Password", "Email", "User Type"};
 		
+		JTable tableData = new JTable(users.length, 5);
+		tableData.setSelectionMode(0);
+		
+		JScrollPane scrollPane = new JScrollPane(tableData);
+		scrollPane.setPreferredSize(new Dimension(500, 500));
+		scrollPane.setAutoscrolls(true);
+		
+		for (int i = 0;i <5;i++) {
+			tableData.getColumnModel().getColumn(i).setHeaderValue(columnNames[i]);
+		}
+
+		int row = 0;
+		int column = 0;
+		for (User user : users) {
+			tableData.setValueAt(user.getUserId(), row, column);
+			tableData.setValueAt(user.getUsername(), row, column + 1);
+			tableData.setValueAt(user.getPassword(), row, column + 2);
+			tableData.setValueAt(user.getEmail(), row, column + 3);
+			tableData.setValueAt(user.getUsertype(), row, column + 4);
+			row++;
+		}
+
 		GUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		GUWindow.setResizable(false);
-		GUWindow.setLayout(lm);	
-		
-		GUcontent.add(usersBox, c);
-		
+		GUWindow.setLayout(lm);
+
+		pane.add(scrollPane);
+		GUcontent.add(pane, c);
+
 		GUbutton.setActionCommand("getUsers");
 		GUWindow.setLocationRelativeTo(null);
 		GUWindow.pack();
 		GUWindow.setVisible(true);
-		
+
 	}
-	
+
 	// skapar fönstret för att skapa användare
 	private void createUserWindow() {
 		CUWindow = new JFrame("Create User");
@@ -322,7 +358,7 @@ public class Client implements ActionListener {
 		CUWindow.setVisible(true);
 	}
 
-	//skapar fönstret för att göra inlägg
+	// skapar fönstret för att göra inlägg
 	private void createPostWindow() {
 		CPWindow = new JFrame("Create Post");
 		Container CPcontent = CPWindow.getContentPane();
@@ -367,7 +403,7 @@ public class Client implements ActionListener {
 		CPWindow.setVisible(true);
 	}
 
-	//skapar login fönster
+	// skapar login fönster
 	private void loginWindow() {
 		loginWindow = new JFrame("Login");
 		Container loginContent = loginWindow.getContentPane();
@@ -408,7 +444,7 @@ public class Client implements ActionListener {
 		loginWindow.setVisible(true);
 	}
 
-	//återställer alla GridBagConstraints
+	// återställer alla GridBagConstraints
 	private void resetConstraints() {
 		c.gridx = 0;
 		c.gridy = 0;
@@ -417,8 +453,6 @@ public class Client implements ActionListener {
 		c.insets = new Insets(0, 0, 0, 0);
 		c.anchor = 10;
 	}
-	
-	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -430,13 +464,13 @@ public class Client implements ActionListener {
 
 		if ("openLogin".equals(e.getActionCommand()))
 			loginWindow();
-		
+
 		if ("openEU".equals(e.getActionCommand()))
 			editUserWindow();
-		
+
 		if ("openEP".equals(e.getActionCommand()))
 			editPostWindow();
-		
+
 		if ("openGU".equals(e.getActionCommand()))
 			getUsersWindow();
 
@@ -457,9 +491,10 @@ public class Client implements ActionListener {
 			CPpostBox.setText("");
 			JOptionPane.showMessageDialog(null, "Post created!");
 		}
-		
-		if ("login".equals(e.getActionCommand())){
-			session = login(loginUsername.getText(), loginPassword.getPassword());
+
+		if ("login".equals(e.getActionCommand())) {
+			session = login(loginUsername.getText(),
+					loginPassword.getPassword());
 			JOptionPane.showMessageDialog(null, session);
 		}
 
@@ -467,15 +502,15 @@ public class Client implements ActionListener {
 			User[] users = um.getUsers(server);
 			String string = "";
 			getUsersWindow();
-			
+
 			for (User user : users) {
 				string = string + user.getUserId() + " " + user.getUsername()
 						+ " " + user.getEmail() + "\n";
 			}
 			usersBox.setText(string);
 		}
-		
-		if("showPosts".equals(e.getActionCommand())) {
+
+		if ("showPosts".equals(e.getActionCommand())) {
 			Post[] posts = pm.getPosts(server);
 			JFrame test = new JFrame("test");
 			test.setLayout(lm);
@@ -488,10 +523,10 @@ public class Client implements ActionListener {
 			scroll.setPreferredSize(new Dimension(500, 700));
 			scroll.getVerticalScrollBar().setUnitIncrement(10);
 			test.add(scroll);
-			
+
 			ArrayList<JTextField> fields = new ArrayList<JTextField>();
 			ArrayList<JTextArea> areas = new ArrayList<JTextArea>();
-			
+
 			int i = 0;
 			resetConstraints();
 			c.gridx = 0;
@@ -499,7 +534,7 @@ public class Client implements ActionListener {
 			for (Post post : posts) {
 				fields.add(new JTextField(post.getTitle(), 43));
 				fields.get(i).setEditable(false);
-				
+
 				areas.add(new JTextArea(post.getText(), 20, 43));
 				areas.get(i).setEditable(false);
 				areas.get(i).setLineWrap(true);
@@ -509,10 +544,21 @@ public class Client implements ActionListener {
 				pane.add(areas.get(i), c);
 				i++;
 			}
-			
+
 			test.pack();
 			test.setLocationRelativeTo(null);
 			test.setVisible(true);
+		}
+
+		if ("deleteUser".equals(e.getActionCommand())) {
+			RemoveUser arg = new RemoveUser();
+			arg.setName(delUserField.getText());
+
+			try {
+				server.removeUser(arg);
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 
