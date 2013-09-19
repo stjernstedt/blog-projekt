@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -8,14 +9,8 @@ import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
-import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Logger;
-
-import javax.swing.*;
-
-import java.awt.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -23,6 +18,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -37,11 +33,6 @@ import managers.UserManager;
 import org.apache.axis2.AxisFault;
 
 import core.CoreStub;
-import core.CoreStub.CreateComment;
-import core.CoreStub.CreatePost;
-import core.CoreStub.CreateUser;
-import core.CoreStub.GetUsers;
-import core.CoreStub.GetUsersResponse;
 import core.CoreStub.Login;
 import core.CoreStub.LoginResponse;
 import core.CoreStub.Post;
@@ -136,17 +127,18 @@ public class Client implements ActionListener {
 		mainContent.add(manageUser, c);
 		
 		
-		// Sätter storleken på knapparna, ska fixa variabel för detta
-		button1.setPreferredSize(new Dimension(150, 25));
-		button2.setPreferredSize(new Dimension(150, 25));
-		button3.setPreferredSize(new Dimension(150, 25));
-		GUbutton.setPreferredSize(new Dimension(150, 25));
-		manageUser.setPreferredSize(new Dimension(150, 25));
-		managePost.setPreferredSize(new Dimension(150, 25));
-		removeUser.setPreferredSize(new Dimension(150, 25));
-		updateUser.setPreferredSize(new Dimension(150, 25));
-		removePost.setPreferredSize(new Dimension(150, 25));
-		updatePost.setPreferredSize(new Dimension(150, 25));
+		// Sätter storleken på knapparna
+		Dimension knappDim = new Dimension(150, 25);
+		button1.setPreferredSize(knappDim);
+		button2.setPreferredSize(knappDim);
+		button3.setPreferredSize(knappDim);
+		GUbutton.setPreferredSize(knappDim);
+		manageUser.setPreferredSize(knappDim);
+		managePost.setPreferredSize(knappDim);
+		removeUser.setPreferredSize(knappDim);
+		updateUser.setPreferredSize(knappDim);
+		removePost.setPreferredSize(knappDim);
+		updatePost.setPreferredSize(knappDim);
 		
 		
 		button1.addActionListener(this);
@@ -340,6 +332,7 @@ public class Client implements ActionListener {
 		CPWindow.setLayout(lm);
 
 		CPpostBox.setBorder(border);
+		CPpostBox.setLineWrap(true);
 
 		JLabel CPlabel1 = new JLabel("Title");
 		JLabel CPlabel2 = new JLabel("Text");
@@ -509,6 +502,7 @@ public class Client implements ActionListener {
 				
 				areas.add(new JTextArea(post.getText(), 20, 43));
 				areas.get(i).setEditable(false);
+				areas.get(i).setLineWrap(true);
 				c.gridy += 1;
 				pane.add(fields.get(i), c);
 				c.gridy += 2;
