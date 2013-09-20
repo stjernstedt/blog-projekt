@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -28,7 +27,6 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import managers.CommentManager;
 import managers.PostManager;
@@ -51,13 +49,14 @@ public class Client implements ActionListener {
 	private PostManager pm = new PostManager();
 	private UserManager um = new UserManager();
 	private CommentManager cm = new CommentManager();
-	
+
 	private JFrame window = new JFrame("Blog Admin");
 	private JFrame CPWindow;
 	private JFrame CUWindow;
 	private JFrame loginWindow;
 	private JFrame MUWindow;
 	private JFrame MPWindow;
+	private JFrame EUWindow;
 
 	private Border border = BorderFactory
 			.createEtchedBorder(EtchedBorder.LOWERED);
@@ -93,8 +92,9 @@ public class Client implements ActionListener {
 	private JButton updatePost = new JButton("Edit Posts");
 	private JButton button3 = new JButton("Login");
 	private JButton CUbutton = new JButton("Create User");
+	private JButton EUbutton = new JButton("Apply Changes");
 	private JButton deleteUser = new JButton("Remove User");
-	private JButton updateUser = new JButton("Edit User");
+	private JButton editUser = new JButton("Edit User");
 	private JButton GUbutton = new JButton("Get Users");
 	private JButton CPbutton = new JButton("Post");
 	private JButton loginButton = new JButton("Login");
@@ -144,7 +144,7 @@ public class Client implements ActionListener {
 		manageUser.setPreferredSize(knappDim);
 		managePost.setPreferredSize(knappDim);
 		deleteUser.setPreferredSize(knappDim);
-		updateUser.setPreferredSize(knappDim);
+		editUser.setPreferredSize(knappDim);
 		removePost.setPreferredSize(knappDim);
 		updatePost.setPreferredSize(knappDim);
 
@@ -207,14 +207,14 @@ public class Client implements ActionListener {
 
 	// hantera användare fönstret
 	private void manageUsersWindow() {
-		MUWindow = new JFrame("Manage User");
+		MUWindow = new JFrame("Manage Users");
 		Container MUcontent = MUWindow.getContentPane();
 		JPanel pane = new JPanel();
-		
+
 		User[] users = um.getUsers(server);
 		String[] columnNames = { "UserID", "Username", "Password", "Email",
 				"User Type" };
-		
+
 		usersTable = new JTable(users.length, 5);
 		usersTable.setModel(model);
 		usersTable.setSelectionMode(0);
@@ -227,7 +227,7 @@ public class Client implements ActionListener {
 		MUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		MUWindow.setResizable(false);
 		MUWindow.setLayout(lm);
-		
+
 		JScrollPane scrollPane = new JScrollPane(usersTable);
 		scrollPane.setPreferredSize(new Dimension(500, 500));
 		scrollPane.setAutoscrolls(true);
@@ -237,7 +237,7 @@ public class Client implements ActionListener {
 		c.insets = new Insets(5, 5, 5, 5);
 		MUcontent.add(button1, c);
 		c.gridy = 1;
-		MUcontent.add(updateUser, c);
+		MUcontent.add(editUser, c);
 		c.gridy = 2;
 		MUcontent.add(deleteUser, c);
 		c.gridy = 0;
@@ -245,6 +245,8 @@ public class Client implements ActionListener {
 		c.gridheight = 5;
 		MUcontent.add(pane, c);
 
+		editUser.addActionListener(this);
+		editUser.setActionCommand("openEU");
 		deleteUser.addActionListener(this);
 		deleteUser.setActionCommand("deleteUser");
 
@@ -257,46 +259,12 @@ public class Client implements ActionListener {
 	// uppdaterar tabellen med användare
 	private void updateUsersPanel() {
 		User[] users = um.getUsers(server);
-		
+
 		model.setRowCount(0);
 		for (User user : users) {
-			model.addRow(new Object[] {
-					user.getUserId(),
-					user.getUsername(),
-					user.getPassword(),
-					user.getEmail(),
-					user.getUsertype()
-			});
+			model.addRow(new Object[] { user.getUserId(), user.getUsername(),
+					user.getPassword(), user.getEmail(), user.getUsertype() });
 		}
-//		usersTable.repaint();
-	}
-
-	// hantera inlägg fönstret
-	private void managePostsWindow() {
-		MPWindow = new JFrame("Manage Post");
-		Container MPcontent = MPWindow.getContentPane();
-		resetConstraints();
-
-		MPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		MPWindow.setResizable(false);
-		MPWindow.setLayout(lm);
-
-		c.insets = new Insets(5, 5, 5, 5);
-		MPcontent.add(button2, c);
-		c.gridy = 1;
-		MPcontent.add(removePost, c);
-		c.gridy = 2;
-		MPcontent.add(updatePost, c);
-		c.gridy = 3;
-		MPcontent.add(showPosts, c);
-
-		showPosts.addActionListener(this);
-		showPosts.setActionCommand("showPosts");
-
-		MPWindow.pack();
-		MPWindow.setLocationRelativeTo(null);
-		MPWindow.setVisible(true);
-
 	}
 
 	// skapar fönstret för att skapa användare
@@ -349,6 +317,91 @@ public class Client implements ActionListener {
 		CUWindow.pack();
 		CUWindow.setLocationRelativeTo(null);
 		CUWindow.setVisible(true);
+	}
+
+	// skapar edit user fönstret
+	private void editUserWindow(User user) {
+		EUWindow = new JFrame("Edit User");
+		Container EUcontent = EUWindow.getContentPane();
+
+		JLabel label1 = new JLabel("Username:");
+		JLabel label2 = new JLabel("Password:");
+		JLabel label3 = new JLabel("Email:");
+		JLabel label4 = new JLabel("Usertype:");
+
+		EUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		EUWindow.setResizable(false);
+		EUWindow.setLayout(lm);
+
+		resetConstraints();
+		c.insets = new Insets(5, 5, 5, 5);
+		c.weightx = 0.5;
+		c.weighty = 0.5;
+		c.gridx = 0;
+		c.gridy = 0;
+		EUcontent.add(label1, c);
+		c.gridy = 1;
+		EUcontent.add(label2, c);
+		c.gridy = 2;
+		EUcontent.add(label3, c);
+		c.gridy = 3;
+		EUcontent.add(label4, c);
+
+		c.gridx = 1;
+		c.gridy = 0;
+		EUcontent.add(textField1, c);
+		c.gridy = 1;
+		EUcontent.add(textField2, c);
+		c.gridy = 2;
+		EUcontent.add(textField3, c);
+		c.gridy = 3;
+		combobox.setSelectedIndex(1);
+		EUcontent.add(combobox, c);
+
+		c.gridx = 2;
+		c.gridy = 4;
+		c.weightx = 0.1;
+		c.weighty = 1;
+
+		EUbutton.setActionCommand("editUser");
+		EUcontent.add(EUbutton, c);
+
+		textField1.setText(user.getUsername());
+		textField2.setText(user.getPassword());
+		textField3.setText(user.getEmail());
+		combobox.setSelectedIndex(user.getUsertype());
+
+		EUWindow.pack();
+		EUWindow.setLocationRelativeTo(null);
+		EUWindow.setVisible(true);
+	}
+
+	// hantera inlägg fönstret
+	private void managePostsWindow() {
+		MPWindow = new JFrame("Manage Post");
+		Container MPcontent = MPWindow.getContentPane();
+		resetConstraints();
+
+		MPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		MPWindow.setResizable(false);
+		MPWindow.setLayout(lm);
+
+		c.insets = new Insets(5, 5, 5, 5);
+		MPcontent.add(button2, c);
+		c.gridy = 1;
+		MPcontent.add(removePost, c);
+		c.gridy = 2;
+		MPcontent.add(updatePost, c);
+		c.gridy = 3;
+		MPcontent.add(showPosts, c);
+
+		showPosts.addActionListener(this);
+		showPosts.setActionCommand("showPosts");
+
+		MPWindow.pack();
+		MPWindow.setLocationRelativeTo(null);
+		MPWindow.setVisible(true);
+
 	}
 
 	// skapar fönstret för att göra inlägg
@@ -465,6 +518,10 @@ public class Client implements ActionListener {
 		if ("openMP".equals(e.getActionCommand()))
 			managePostsWindow();
 
+		if ("openEU".equals(e.getActionCommand()))
+			editUserWindow(um.getUser(server, Integer.parseInt(usersTable.getModel().getValueAt(
+					usersTable.getSelectedRow(), 0).toString())));
+
 		if ("createUser".equals(e.getActionCommand())) {
 			um.createUser(server, textField1.getText(), textField2.getText(),
 					textField3.getText(), combobox.getSelectedIndex());
@@ -473,6 +530,23 @@ public class Client implements ActionListener {
 			textField2.setText("");
 			textField3.setText("");
 			JOptionPane.showMessageDialog(null, "User created!");
+			updateUsersPanel();
+		}
+		
+		if("editUser".equals(e.getActionCommand()))
+			//TODO skapa
+
+		if ("deleteUser".equals(e.getActionCommand())) {
+			RemoveUser arg = new RemoveUser();
+			arg.setUserId(Integer.parseInt(usersTable.getModel()
+					.getValueAt(usersTable.getSelectedRow(), 0).toString()));
+
+			try {
+				server.removeUser(arg);
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
+
 			updateUsersPanel();
 		}
 
@@ -489,18 +563,6 @@ public class Client implements ActionListener {
 					loginPassword.getPassword());
 			JOptionPane.showMessageDialog(null, session);
 		}
-
-		// if ("getUsers".equals(e.getActionCommand())) {
-		// User[] users = um.getUsers(server);
-		// String string = "";
-		// getUsersWindow();
-		//
-		// for (User user : users) {
-		// string = string + user.getUserId() + " " + user.getUsername()
-		// + " " + user.getEmail() + "\n";
-		// }
-		// usersBox.setText(string);
-		// }
 
 		if ("showPosts".equals(e.getActionCommand())) {
 			Post[] posts = pm.getPosts(server);
@@ -541,19 +603,6 @@ public class Client implements ActionListener {
 			test.setVisible(true);
 		}
 
-		if ("deleteUser".equals(e.getActionCommand())) {
-			RemoveUser arg = new RemoveUser();
-			arg.setUserId(Integer.parseInt(usersTable.getModel()
-					.getValueAt(usersTable.getSelectedRow(), 0).toString()));
-
-			try {
-				server.removeUser(arg);
-			} catch (RemoteException e1) {
-				e1.printStackTrace();
-			}
-			
-			updateUsersPanel();
-		}
 	}
 
 }

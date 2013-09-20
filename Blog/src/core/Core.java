@@ -31,6 +31,11 @@ public class Core {
 
 		userManager.createUser(user);
 	}
+	
+	// ändrar en användare
+	public void editUser() {
+		//TODO edit user metod
+	}
 
 	// tar bort en användare
 	public void removeUser(int userId) {
@@ -47,6 +52,13 @@ public class Core {
 		result = userManager.getUsers();
 
 		return result;
+	}
+	
+	// hämtar en användare
+	public User getUser(int userId) {
+		UserManager userManager = UserManager.getInstance();
+		
+		return userManager.getUser(userId);
 	}
 
 	// hämtar alla inlägg
@@ -65,7 +77,7 @@ public class Core {
 		UserManager userManager = UserManager.getInstance();
 
 		logg.info(username + " " + password);
-		User user = userManager.getUser(username);
+		User user = userManager.searchUser(username);
 		logg.info("stored password: " + user.getPassword()
 				+ "  user password: " + password);
 		if (user.getPassword().equals(password)) {

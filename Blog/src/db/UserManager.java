@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
@@ -42,6 +41,10 @@ public class UserManager {
 
 		return user;
 	}
+	
+	public void editUser() {
+		//TODO skapa metoden
+	}
 
 	// hämtar alla användare från databasen
 	public List<User> getUsers() {
@@ -64,17 +67,33 @@ public class UserManager {
 	}
 
 	// hämtar en specifik användare
-	public User getUser(String name) {
+	public User getUser(int userId) {
 		EntityManager em = connection.getEntityManager();
 		User user = null;
 
-		logg.info("getuser: " + name);
+		em.getTransaction().begin();
+		try {
+			user = em.find(User.class, userId);
+			em.getTransaction().commit();
+		} finally {
+			if (em.getTransaction().isActive())
+				em.getTransaction().rollback();
+			em.close();
+			logg.info("User: " + user);
+		}
+		return user;
+	}
+	
+	public User searchUser(String search) {
+		EntityManager em = connection.getEntityManager();
+		User user = null;
+
 		em.getTransaction().begin();
 		try {
 			TypedQuery<User> q = em.createQuery(
-					"SELECT user FROM User user WHERE user.username = :name",
+					"SELECT user FROM User user WHERE user.username = :search",
 					User.class);
-			user = q.setParameter("name", name).getSingleResult();
+			user = q.setParameter("search", search).getSingleResult();
 			em.getTransaction().commit();
 		} finally {
 			if (em.getTransaction().isActive())
@@ -90,8 +109,8 @@ public class UserManager {
 		EntityManager em = connection.getEntityManager();
 
 		em.getTransaction().begin();
-		User user = em.find(User.class, userId);
 		try {
+			User user = em.find(User.class, userId);
 			em.remove(user);
 			em.getTransaction().commit();
 		} finally {
