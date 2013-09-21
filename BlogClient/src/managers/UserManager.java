@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import core.CoreStub;
 import core.CoreStub.CreateUser;
+import core.CoreStub.EditUser;
 import core.CoreStub.GetUser;
 import core.CoreStub.GetUserResponse;
 import core.CoreStub.GetUsers;
@@ -26,13 +27,13 @@ public class UserManager {
 
 		return result.get_return();
 	}
-	
+
 	public User getUser(CoreStub server, int userId) {
 		GetUser arg = new GetUser();
 		GetUserResponse result = null;
-		
+
 		arg.setUserId(userId);
-		
+
 		try {
 			result = server.getUser(arg);
 		} catch (RemoteException e) {
@@ -40,7 +41,7 @@ public class UserManager {
 			System.err.println(e.getLocalizedMessage());
 			System.exit(-2);
 		}
-		
+
 		return result.get_return();
 	}
 
@@ -58,5 +59,21 @@ public class UserManager {
 			e.printStackTrace();
 		}
 
+	}
+
+	public void editUser(CoreStub server, int userId, String username,
+			String password, String email, int usertype) {
+		EditUser user = new EditUser();
+		user.setUserId(userId);
+		user.setUsername(username);
+		user.setPassword(password);
+		user.setEmail(email);
+		user.setUsertype(usertype);
+		
+		try {
+			server.editUser(user);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 }

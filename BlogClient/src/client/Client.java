@@ -65,12 +65,11 @@ public class Client implements ActionListener {
 	private LayoutManager lm = new GridBagLayout();
 	private GridBagConstraints c = new GridBagConstraints();
 
-	private JTextField textField1 = new JTextField(15);
-	private JTextField textField2 = new JTextField(15);
-	private JTextField textField3 = new JTextField(15);
+	private JTextField usernameField = new JTextField(15);
+	private JTextField passwordField = new JTextField(15);
+	private JTextField emailField = new JTextField(15);
 	private JTextField CPtitle = new JTextField(80);
 	private JTextField loginUsername = new JTextField(15);
-	private JTextField delUserField = new JTextField(15);
 
 	private JPasswordField loginPassword = new JPasswordField(15);
 
@@ -79,7 +78,7 @@ public class Client implements ActionListener {
 
 	private String[] choices = { "Admin", "User", "Guest" };
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private JComboBox combobox = new JComboBox(choices);
+	private JComboBox usertypeCombobox = new JComboBox(choices);
 
 	JTable usersTable;
 	DefaultTableModel model = new DefaultTableModel();
@@ -128,12 +127,8 @@ public class Client implements ActionListener {
 		mainContent.add(button3, c);
 		c.gridy = 1;
 		mainContent.add(managePost, c);
-		c.gridx = 0;
 		c.gridy = 2;
 		mainContent.add(manageUser, c);
-		c.gridy = 3;
-		mainContent.add(delUserField);
-		c.gridy = 4;
 
 		// Sätter storleken på knapparna
 		Dimension knappDim = new Dimension(150, 25);
@@ -163,6 +158,9 @@ public class Client implements ActionListener {
 
 		CUbutton.addActionListener(this);
 		CPbutton.addActionListener(this);
+		EUbutton.addActionListener(this);
+		editUser.addActionListener(this);
+		deleteUser.addActionListener(this);
 
 		window.pack();
 		window.setLocationRelativeTo(null); // centrerar fönstret
@@ -219,6 +217,7 @@ public class Client implements ActionListener {
 		usersTable.setModel(model);
 		usersTable.setSelectionMode(0);
 
+		model.setColumnCount(0);
 		for (int i = 0; i < 5; i++) {
 			model.addColumn(columnNames[i]);
 		}
@@ -245,9 +244,7 @@ public class Client implements ActionListener {
 		c.gridheight = 5;
 		MUcontent.add(pane, c);
 
-		editUser.addActionListener(this);
 		editUser.setActionCommand("openEU");
-		deleteUser.addActionListener(this);
 		deleteUser.setActionCommand("deleteUser");
 
 		MUWindow.pack();
@@ -297,14 +294,14 @@ public class Client implements ActionListener {
 
 		c.gridx = 1;
 		c.gridy = 0;
-		CUcontent.add(textField1, c);
+		CUcontent.add(usernameField, c);
 		c.gridy = 1;
-		CUcontent.add(textField2, c);
+		CUcontent.add(passwordField, c);
 		c.gridy = 2;
-		CUcontent.add(textField3, c);
+		CUcontent.add(emailField, c);
 		c.gridy = 3;
-		combobox.setSelectedIndex(1);
-		CUcontent.add(combobox, c);
+		usertypeCombobox.setSelectedIndex(1);
+		CUcontent.add(usertypeCombobox, c);
 
 		c.gridx = 2;
 		c.gridy = 4;
@@ -349,27 +346,25 @@ public class Client implements ActionListener {
 
 		c.gridx = 1;
 		c.gridy = 0;
-		EUcontent.add(textField1, c);
+		EUcontent.add(usernameField, c);
 		c.gridy = 1;
-		EUcontent.add(textField2, c);
+		EUcontent.add(passwordField, c);
 		c.gridy = 2;
-		EUcontent.add(textField3, c);
+		EUcontent.add(emailField, c);
 		c.gridy = 3;
-		combobox.setSelectedIndex(1);
-		EUcontent.add(combobox, c);
-
+		usertypeCombobox.setSelectedIndex(user.getUsertype());
+		EUcontent.add(usertypeCombobox, c);
 		c.gridx = 2;
 		c.gridy = 4;
 		c.weightx = 0.1;
 		c.weighty = 1;
-
-		EUbutton.setActionCommand("editUser");
 		EUcontent.add(EUbutton, c);
 
-		textField1.setText(user.getUsername());
-		textField2.setText(user.getPassword());
-		textField3.setText(user.getEmail());
-		combobox.setSelectedIndex(user.getUsertype());
+		EUbutton.setActionCommand("editUser");
+
+		usernameField.setText(user.getUsername());
+		passwordField.setText(user.getPassword());
+		emailField.setText(user.getEmail());
 
 		EUWindow.pack();
 		EUWindow.setLocationRelativeTo(null);
@@ -518,23 +513,38 @@ public class Client implements ActionListener {
 		if ("openMP".equals(e.getActionCommand()))
 			managePostsWindow();
 
-		if ("openEU".equals(e.getActionCommand()))
-			editUserWindow(um.getUser(server, Integer.parseInt(usersTable.getModel().getValueAt(
-					usersTable.getSelectedRow(), 0).toString())));
+		if ("openEU".equals(e.getActionCommand())) {
+			editUserWindow(um.getUser(
+					server,
+					Integer.parseInt(usersTable.getModel()
+							.getValueAt(usersTable.getSelectedRow(), 0)
+							.toString())));
+		}
 
 		if ("createUser".equals(e.getActionCommand())) {
-			um.createUser(server, textField1.getText(), textField2.getText(),
-					textField3.getText(), combobox.getSelectedIndex());
+			um.createUser(server, usernameField.getText(),
+					passwordField.getText(), emailField.getText(),
+					usertypeCombobox.getSelectedIndex());
 			CUWindow.dispose();
-			textField1.setText("");
-			textField2.setText("");
-			textField3.setText("");
+			usernameField.setText("");
+			passwordField.setText("");
+			emailField.setText("");
 			JOptionPane.showMessageDialog(null, "User created!");
 			updateUsersPanel();
 		}
-		
-		if("editUser".equals(e.getActionCommand()))
-			//TODO skapa
+
+		if ("editUser".equals(e.getActionCommand())) {
+			um.editUser(server, Integer.parseInt(model.getValueAt(
+					usersTable.getSelectedRow(), 0).toString()), usernameField.getText(),
+					passwordField.getText(), emailField.getText(),
+					usertypeCombobox.getSelectedIndex());
+			EUWindow.dispose();
+			usernameField.setText("");
+			passwordField.setText("");
+			emailField.setText("");
+			JOptionPane.showMessageDialog(null, "User updated!");
+			updateUsersPanel();
+		}
 
 		if ("deleteUser".equals(e.getActionCommand())) {
 			RemoveUser arg = new RemoveUser();
@@ -604,5 +614,4 @@ public class Client implements ActionListener {
 		}
 
 	}
-
 }

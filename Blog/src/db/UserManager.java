@@ -42,8 +42,22 @@ public class UserManager {
 		return user;
 	}
 	
-	public void editUser() {
-		//TODO skapa metoden
+	public void editUser(int userId, String username, String password, String email, int usertype) {
+		EntityManager em = connection.getEntityManager();
+		
+		em.getTransaction().begin();
+		try {
+			User user = em.find(User.class, userId);
+			user.setUsername(username);
+			user.setPassword(password);
+			user.setEmail(email);
+			user.setUsertype(usertype);
+			em.getTransaction().commit();
+		} finally {
+			if (em.getTransaction().isActive())
+				em.getTransaction().rollback();
+			em.close();
+		}
 	}
 
 	// hämtar alla användare från databasen
@@ -79,7 +93,6 @@ public class UserManager {
 			if (em.getTransaction().isActive())
 				em.getTransaction().rollback();
 			em.close();
-			logg.info("User: " + user);
 		}
 		return user;
 	}
@@ -99,7 +112,6 @@ public class UserManager {
 			if (em.getTransaction().isActive())
 				em.getTransaction().rollback();
 			em.close();
-			logg.info("User: " + user);
 		}
 		return user;
 	}

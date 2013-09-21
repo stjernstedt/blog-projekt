@@ -17,12 +17,12 @@ import db.UserManager;
 public class Core {
 
 	private Logger logg = Logger.getLogger("Core Logger");
+	private UserManager userManager = UserManager.getInstance();
 
 	// skapar en användare
 	public void createUser(String username, String password, String email,
 			int usertype) {
 		User user = new User();
-		UserManager userManager = UserManager.getInstance();
 
 		user.setUsername(username);
 		user.setPassword(password);
@@ -33,20 +33,17 @@ public class Core {
 	}
 	
 	// ändrar en användare
-	public void editUser() {
-		//TODO edit user metod
+	public void editUser(int userId, String username, String password, String email, int usertype) {
+		userManager.editUser(userId, username, password, email, usertype);
 	}
 
 	// tar bort en användare
 	public void removeUser(int userId) {
-		UserManager userManager = UserManager.getInstance();
 		userManager.removeUser(userId);
 	}
 
 	// hämtar alla användare
 	public List<User> getUsers() {
-		UserManager userManager = UserManager.getInstance();
-
 		List<User> result = new ArrayList<User>();
 
 		result = userManager.getUsers();
@@ -56,8 +53,6 @@ public class Core {
 	
 	// hämtar en användare
 	public User getUser(int userId) {
-		UserManager userManager = UserManager.getInstance();
-		
 		return userManager.getUser(userId);
 	}
 
@@ -74,8 +69,6 @@ public class Core {
 
 	// login metod
 	public String login(String username, String password) {
-		UserManager userManager = UserManager.getInstance();
-
 		logg.info(username + " " + password);
 		User user = userManager.searchUser(username);
 		logg.info("stored password: " + user.getPassword()
