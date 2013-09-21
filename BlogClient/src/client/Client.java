@@ -161,6 +161,7 @@ public class Client implements ActionListener {
 		EUbutton.addActionListener(this);
 		editUser.addActionListener(this);
 		deleteUser.addActionListener(this);
+		showPosts.addActionListener(this);
 
 		window.pack();
 		window.setLocationRelativeTo(null); // centrerar fönstret
@@ -390,7 +391,6 @@ public class Client implements ActionListener {
 		c.gridy = 3;
 		MPcontent.add(showPosts, c);
 
-		showPosts.addActionListener(this);
 		showPosts.setActionCommand("showPosts");
 
 		MPWindow.pack();
