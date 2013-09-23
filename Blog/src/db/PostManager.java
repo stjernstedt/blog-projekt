@@ -71,4 +71,20 @@ public class PostManager {
 		}
 		return allPosts;
 	}
+	
+	public Post getPost(int postId) {
+		EntityManager em = connection.getEntityManager();
+		Post post = null;
+		
+		em.getTransaction().begin();
+		try {
+			post = em.find(Post.class, postId);
+			em.getTransaction().commit();
+		} finally {
+			if (em.getTransaction().isActive())
+				em.getTransaction().rollback();
+			em.close();
+		}
+		return post;
+	}
 }
