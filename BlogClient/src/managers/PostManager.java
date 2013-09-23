@@ -2,6 +2,8 @@ package managers;
 
 import java.rmi.RemoteException;
 
+
+
 import core.CoreStub;
 import core.CoreStub.CreatePost;
 import core.CoreStub.GetPosts;
@@ -23,6 +25,7 @@ public class PostManager {
 			e.printStackTrace();
 		}
 	}
+	
 
 	public Post[] getPosts(CoreStub server) {
 		GetPosts arg = new GetPosts();

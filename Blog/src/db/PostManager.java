@@ -1,6 +1,7 @@
 package db;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -37,6 +38,27 @@ public class PostManager {
 
 		return post;
 	}
+	
+	// editera inlägg
+	public void editPost(int postId, String title, String text, Calendar date, int userId) {
+		EntityManager em = connection.getEntityManager();
+		
+		em.getTransaction().begin();
+		try {
+			Post post = em.find(Post.class, userId);
+			post.setPostId(postId);
+			post.setTitle(title);
+			post.setText(text);
+//			post.setDate(date);
+			post.setUserId(userId);
+			em.getTransaction().commit();
+		} finally {
+			if (em.getTransaction().isActive())
+				em.getTransaction().rollback();
+			em.close();
+		}
+	}
+
 
 	// tar bort ett inlägg
 	public void removePost(int postId) {
