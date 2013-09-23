@@ -40,6 +40,7 @@ import core.CoreStub;
 import core.CoreStub.Login;
 import core.CoreStub.LoginResponse;
 import core.CoreStub.Post;
+import core.CoreStub.RemovePost;
 import core.CoreStub.RemoveUser;
 import core.CoreStub.User;
 
@@ -56,8 +57,6 @@ public class Client implements ActionListener {
 	private JFrame CPWindow;
 	private JFrame CUWindow;
 	private JFrame loginWindow;
-	private JFrame MUWindow;
-	private JFrame MPWindow;
 	private JFrame EUWindow;
 
 	private Dimension knappDim = new Dimension(150, 25);
@@ -87,7 +86,9 @@ public class Client implements ActionListener {
 	private JComboBox usertypeCombobox = new JComboBox(choices);
 
 	private JTable usersTable;
-	private DefaultTableModel model = new DefaultTableModel();
+	private JTable postsTable;
+	private DefaultTableModel usersModel = new DefaultTableModel();
+	private DefaultTableModel postsModel = new DefaultTableModel();
 
 	public static void main(String[] args) {
 
@@ -125,7 +126,8 @@ public class Client implements ActionListener {
 		managePosts.addActionListener(this);
 		managePosts.setActionCommand("openMP");
 
-		JLabel test = new JLabel(dateFormatter.format(calendar.getTime()));
+//		JLabel test = new JLabel(dateFormatter.format(calendar.getTime()));
+		JLabel test = new JLabel();
 		mainContent.setLayout(lm);
 
 		resetConstraints();
@@ -180,41 +182,39 @@ public class Client implements ActionListener {
 
 	// hantera användare fönstret
 	private void manageUsersWindow() {
-		MUWindow = new JFrame("Manage Users");
+		JFrame MUWindow = new JFrame("Manage Users");
 		Container MUcontent = MUWindow.getContentPane();
 		JPanel pane = new JPanel();
 
+		MUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		MUWindow.setResizable(false);
+		MUWindow.setLayout(lm);
+
 		JButton createUser = new JButton("Create User");
-		JButton deleteUser = new JButton("Remove User");
+		JButton removeUser = new JButton("Remove User");
 		JButton editUser = new JButton("Edit User");
 
 		createUser.setPreferredSize(knappDim);
 		editUser.setPreferredSize(knappDim);
-		deleteUser.setPreferredSize(knappDim);
+		removeUser.setPreferredSize(knappDim);
 
 		createUser.addActionListener(this);
 		editUser.addActionListener(this);
-		deleteUser.addActionListener(this);
-
-		createUser.setActionCommand("openCU");
+		removeUser.addActionListener(this);
 
 		User[] users = um.getUsers(server);
 		String[] columnNames = { "UserID", "Username", "Password", "Email",
 				"User Type" };
 
-		usersTable = new JTable(users.length, 5);
-		usersTable.setModel(model);
+		usersTable = new JTable(users.length, columnNames.length);
+		usersTable.setModel(usersModel);
 		usersTable.setSelectionMode(0);
 
-		model.setColumnCount(0);
+		usersModel.setColumnCount(0);
 		for (int i = 0; i < 5; i++) {
-			model.addColumn(columnNames[i]);
+			usersModel.addColumn(columnNames[i]);
 		}
-		updateUsersPanel();
-
-		MUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		MUWindow.setResizable(false);
-		MUWindow.setLayout(lm);
+		updateUsersTable();
 
 		JScrollPane scrollPane = new JScrollPane(usersTable);
 		scrollPane.setPreferredSize(new Dimension(500, 500));
@@ -227,14 +227,15 @@ public class Client implements ActionListener {
 		c.gridy = 1;
 		MUcontent.add(editUser, c);
 		c.gridy = 2;
-		MUcontent.add(deleteUser, c);
+		MUcontent.add(removeUser, c);
 		c.gridy = 0;
 		c.gridx = 1;
 		c.gridheight = 5;
 		MUcontent.add(pane, c);
 
 		editUser.setActionCommand("openEU");
-		deleteUser.setActionCommand("deleteUser");
+		removeUser.setActionCommand("removeUser");
+		createUser.setActionCommand("openCU");
 
 		MUWindow.pack();
 		MUWindow.setLocationRelativeTo(null);
@@ -243,13 +244,14 @@ public class Client implements ActionListener {
 	}
 
 	// uppdaterar tabellen med användare
-	private void updateUsersPanel() {
+	private void updateUsersTable() {
 		User[] users = um.getUsers(server);
 
-		model.setRowCount(0);
+		usersModel.setRowCount(0);
 		for (User user : users) {
-			model.addRow(new Object[] { user.getUserId(), user.getUsername(),
-					user.getPassword(), user.getEmail(), user.getUsertype() });
+			usersModel.addRow(new Object[] { user.getUserId(),
+					user.getUsername(), user.getPassword(), user.getEmail(),
+					user.getUsertype() });
 		}
 	}
 
@@ -368,8 +370,9 @@ public class Client implements ActionListener {
 
 	// hantera inlägg fönstret
 	private void managePostsWindow() {
-		MPWindow = new JFrame("Manage Post");
+		JFrame MPWindow = new JFrame("Manage Post");
 		Container MPcontent = MPWindow.getContentPane();
+		JPanel pane = new JPanel();
 
 		JButton updatePost = new JButton("Edit Post");
 		JButton showPosts = new JButton("Show Posts");
@@ -382,15 +385,40 @@ public class Client implements ActionListener {
 		showPosts.setPreferredSize(knappDim);
 
 		createPost.addActionListener(this);
+		removePost.addActionListener(this);
 		showPosts.addActionListener(this);
 
 		createPost.setActionCommand("openCP");
+		removePost.setActionCommand("removePost");
 		showPosts.setActionCommand("showPosts");
 
 		MPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		MPWindow.setResizable(false);
 		MPWindow.setLayout(lm);
 
+		Post[] posts = pm.getPosts(server);
+		String[] columnNames = { "PostID", "Title", "Author", "Date" };
+
+		postsTable = new JTable(posts.length, columnNames.length);
+		postsTable.setModel(postsModel);
+		postsTable.setSelectionMode(0);
+
+		postsModel.setColumnCount(0);
+		for (int i = 0; i < columnNames.length; i++) {
+			postsModel.addColumn(columnNames[i]);
+		}
+		postsTable.getColumnModel().getColumn(0).setPreferredWidth(1);
+		postsTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+		postsTable.getColumnModel().getColumn(2).setPreferredWidth(50);
+		postsTable.getColumnModel().getColumn(3).setPreferredWidth(70);
+		updatePostsTable();
+
+		JScrollPane scrollPane = new JScrollPane(postsTable);
+		scrollPane.setPreferredSize(new Dimension(500, 500));
+		scrollPane.setAutoscrolls(true);
+
+		pane.add(scrollPane);
+		
 		resetConstraints();
 		c.insets = new Insets(5, 5, 5, 5);
 		MPcontent.add(createPost, c);
@@ -400,11 +428,26 @@ public class Client implements ActionListener {
 		MPcontent.add(updatePost, c);
 		c.gridy = 3;
 		MPcontent.add(showPosts, c);
+		c.gridy = 0;
+		c.gridx = 1;
+		c.gridheight = 5;
+		MPcontent.add(pane, c);
 
 		MPWindow.pack();
 		MPWindow.setLocationRelativeTo(null);
 		MPWindow.setVisible(true);
 
+	}
+
+	// uppdaterar tabellen med användare
+	private void updatePostsTable() {
+		Post[] posts = pm.getPosts(server);
+
+		postsModel.setRowCount(0);
+		for (Post post : posts) {
+			postsModel.addRow(new Object[] { post.getPostId(), post.getTitle(),
+					post.getUserId(), dateFormatter.format(post.getDate().getTime()) });
+		}
 	}
 
 	// skapar fönstret för att göra inlägg
@@ -543,13 +586,13 @@ public class Client implements ActionListener {
 			passwordField.setText("");
 			emailField.setText("");
 			JOptionPane.showMessageDialog(null, "User created!");
-			updateUsersPanel();
+			updateUsersTable();
 		}
 
 		if ("editUser".equals(e.getActionCommand())) {
 			um.editUser(
 					server,
-					Integer.parseInt(model.getValueAt(
+					Integer.parseInt(usersModel.getValueAt(
 							usersTable.getSelectedRow(), 0).toString()),
 					usernameField.getText(), passwordField.getText(),
 					emailField.getText(), usertypeCombobox.getSelectedIndex());
@@ -558,10 +601,10 @@ public class Client implements ActionListener {
 			passwordField.setText("");
 			emailField.setText("");
 			JOptionPane.showMessageDialog(null, "User updated!");
-			updateUsersPanel();
+			updateUsersTable();
 		}
 
-		if ("deleteUser".equals(e.getActionCommand())) {
+		if ("removeUser".equals(e.getActionCommand())) {
 			RemoveUser arg = new RemoveUser();
 			arg.setUserId(Integer.parseInt(usersTable.getModel()
 					.getValueAt(usersTable.getSelectedRow(), 0).toString()));
@@ -572,15 +615,30 @@ public class Client implements ActionListener {
 				e1.printStackTrace();
 			}
 
-			updateUsersPanel();
+			updateUsersTable();
 		}
 
 		if ("createPost".equals(e.getActionCommand())) {
-			pm.createPost(server, postTitleField.getText(), postTextArea.getText());
+			pm.createPost(server, postTitleField.getText(),
+					postTextArea.getText());
 			CPWindow.dispose();
 			postTitleField.setText("");
 			postTextArea.setText("");
 			JOptionPane.showMessageDialog(null, "Post created!");
+			updatePostsTable();
+		}
+
+		if ("removePost".equals(e.getActionCommand())) {
+			RemovePost arg = new RemovePost();
+			arg.setPostId(Integer.parseInt(postsModel.getValueAt(
+					postsTable.getSelectedRow(), 0).toString()));
+
+			try {
+				server.removePost(arg);
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
+			updatePostsTable();
 		}
 
 		if ("login".equals(e.getActionCommand())) {

@@ -1,7 +1,9 @@
 package data;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -15,7 +17,7 @@ public class Post implements Serializable {
 	private int postId;
 	private String title;
 	private String text;
-	private Date date;
+	private Calendar date;
 	private int userId;
 	
 	public Post() {
@@ -46,12 +48,12 @@ public class Post implements Serializable {
 		this.text = text;
 	}
 
-	public Date getDate() {
+	public Calendar getDate() {
 		return date;
 	}
 
 	public void setDate(Date date) {
-		this.date = date;
+		this.date.setTime(date);
 	}
 
 	public int getUserId() {

@@ -1,11 +1,14 @@
 package core;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import org.apache.axis2.databinding.types.soapencoding.DateTime;
 
 import data.Comment;
 import data.Post;
@@ -18,13 +21,14 @@ import db.UserManager;
 public class Core {
 
 	private Logger logg = Logger.getLogger("Core Logger");
-	private UserManager userManager = UserManager.getInstance();
+	private UserManager um = UserManager.getInstance();
+	private PostManager pm = PostManager.getInstance();
 	private Calendar calendar = Calendar.getInstance();
 
 	// login metod
 	public String login(String username, String password) {
 		logg.info(username + " " + password);
-		User user = userManager.searchUser(username);
+		User user = um.searchUser(username);
 		logg.info("stored password: " + user.getPassword()
 				+ "  user password: " + password);
 		if (user.getPassword().equals(password)) {
@@ -50,58 +54,56 @@ public class Core {
 		user.setEmail(email);
 		user.setUsertype(usertype);
 
-		userManager.createUser(user);
+		um.createUser(user);
 	}
 	
 	// ändrar en användare
 	public void editUser(int userId, String username, String password, String email, int usertype) {
-		userManager.editUser(userId, username, password, email, usertype);
+		um.editUser(userId, username, password, email, usertype);
 	}
 
 	// tar bort en användare
 	public void removeUser(int userId) {
-		userManager.removeUser(userId);
+		um.removeUser(userId);
 	}
 
 	// hämtar alla användare
 	public List<User> getUsers() {
 		List<User> result = new ArrayList<User>();
 
-		result = userManager.getUsers();
+		result = um.getUsers();
 
 		return result;
 	}
 	
 	// hämtar en användare
 	public User getUser(int userId) {
-		return userManager.getUser(userId);
+		return um.getUser(userId);
 	}
 
 	// skapar ett inlägg
 	public void createPost(String title, String text) {
 		Post post = new Post();
-		PostManager postManager = PostManager.getInstance();
 
 		post.setTitle(title);
 		post.setDate(calendar.getTime());
 		post.setText(text);
 		// post.setUserId(userId);
 
-		postManager.createPost(post);
+		pm.createPost(post);
 
 	}
 
-	public void removePost(long sessionId, Post post) {
-
+	// tar bort ett inlägg
+	public void removePost(int postId) {
+		pm.removePost(postId);
 	}
 
 	// hämtar alla inlägg
 	public List<Post> getPosts() {
-		PostManager postManager = PostManager.getInstance();
-
 		List<Post> result = new ArrayList<Post>();
 
-		result = postManager.getPosts();
+		result = pm.getPosts();
 
 		return result;
 	}

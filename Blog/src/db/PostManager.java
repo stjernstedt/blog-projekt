@@ -39,6 +39,22 @@ public class PostManager {
 		return post;
 	}
 	
+	// tar bort ett inlägg
+	public void removePost(int postId) {
+		EntityManager em = connection.getEntityManager();
+		
+		em.getTransaction().begin();
+		try {
+			Post post = em.find(Post.class, postId);
+			em.remove(post);
+			em.getTransaction().commit();
+		} finally {
+			if (em.getTransaction().isActive())
+				em.getTransaction().rollback();
+			em.close();
+		}
+	}
+	
 	public List<Post> getPosts() {
 		EntityManager em = connection.getEntityManager();
 		List<Post> allPosts = new ArrayList<Post>();
