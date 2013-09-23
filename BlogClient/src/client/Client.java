@@ -61,7 +61,6 @@ public class Client implements ActionListener {
 
 	private Dimension knappDim = new Dimension(150, 25);
 
-	private Calendar calendar = Calendar.getInstance();
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat(
 			"yyyy/MM/dd HH:mm:ss");
 
@@ -126,8 +125,6 @@ public class Client implements ActionListener {
 		managePosts.addActionListener(this);
 		managePosts.setActionCommand("openMP");
 
-//		JLabel test = new JLabel(dateFormatter.format(calendar.getTime()));
-		JLabel test = new JLabel();
 		mainContent.setLayout(lm);
 
 		resetConstraints();
@@ -137,8 +134,6 @@ public class Client implements ActionListener {
 		mainContent.add(managePosts, c);
 		c.gridy = 2;
 		mainContent.add(manageUsers, c);
-		c.gridy = 3;
-		mainContent.add(test);
 
 		window.pack();
 		window.setLocationRelativeTo(null); // centrerar fönstret
@@ -418,7 +413,7 @@ public class Client implements ActionListener {
 		scrollPane.setAutoscrolls(true);
 
 		pane.add(scrollPane);
-		
+
 		resetConstraints();
 		c.insets = new Insets(5, 5, 5, 5);
 		MPcontent.add(createPost, c);
@@ -446,7 +441,8 @@ public class Client implements ActionListener {
 		postsModel.setRowCount(0);
 		for (Post post : posts) {
 			postsModel.addRow(new Object[] { post.getPostId(), post.getTitle(),
-					post.getUserId(), dateFormatter.format(post.getDate().getTime()) });
+					post.getUserId(),
+					dateFormatter.format(post.getDate().getTime()) });
 		}
 	}
 

@@ -56,9 +56,10 @@ public class Core {
 
 		um.createUser(user);
 	}
-	
+
 	// ändrar en användare
-	public void editUser(int userId, String username, String password, String email, int usertype) {
+	public void editUser(int userId, String username, String password,
+			String email, int usertype) {
 		um.editUser(userId, username, password, email, usertype);
 	}
 
@@ -75,7 +76,7 @@ public class Core {
 
 		return result;
 	}
-	
+
 	// hämtar en användare
 	public User getUser(int userId) {
 		return um.getUser(userId);

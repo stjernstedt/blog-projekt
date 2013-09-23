@@ -21,8 +21,7 @@ public class PostManager {
 		return postManager;
 	}
 
-	
-	//sparar ett inlägg i databasen
+	// sparar ett inlägg i databasen
 	public Post createPost(Post post) {
 		EntityManager em = connection.getEntityManager();
 		em.getTransaction().begin();
@@ -38,11 +37,11 @@ public class PostManager {
 
 		return post;
 	}
-	
+
 	// tar bort ett inlägg
 	public void removePost(int postId) {
 		EntityManager em = connection.getEntityManager();
-		
+
 		em.getTransaction().begin();
 		try {
 			Post post = em.find(Post.class, postId);
@@ -54,28 +53,31 @@ public class PostManager {
 			em.close();
 		}
 	}
-	
+
+	// hämtar alla inlägg
 	public List<Post> getPosts() {
 		EntityManager em = connection.getEntityManager();
 		List<Post> allPosts = new ArrayList<Post>();
-		
+
 		em.getTransaction().begin();
 		try {
-			TypedQuery<Post> q = em.createQuery("SELECT Post FROM Post post", Post.class);
+			TypedQuery<Post> q = em.createQuery("SELECT Post FROM Post post",
+					Post.class);
 			allPosts = q.getResultList();
 			em.getTransaction().commit();
 		} finally {
-			if(em.getTransaction().isActive())
+			if (em.getTransaction().isActive())
 				em.getTransaction().rollback();
 			em.close();
 		}
 		return allPosts;
 	}
-	
+
+	// hämtar specifikt inlägg
 	public Post getPost(int postId) {
 		EntityManager em = connection.getEntityManager();
 		Post post = null;
-		
+
 		em.getTransaction().begin();
 		try {
 			post = em.find(Post.class, postId);

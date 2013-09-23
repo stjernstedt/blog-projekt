@@ -17,7 +17,7 @@ public class Post implements Serializable {
 	private int postId;
 	private String title;
 	private String text;
-	private Calendar date;
+	private Calendar date = Calendar.getInstance();
 	private int userId;
 	
 	public Post() {
