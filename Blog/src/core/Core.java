@@ -74,6 +74,16 @@ public class Core {
 
 		result = um.getUsers();
 
+		if (result.isEmpty()) {
+			User user = new User();
+			user.setUsername("admin");
+			user.setPassword("admin");
+			user.setEmail("admin@admin");
+			user.setUsertype(0);
+			um.createUser(user);
+			result = um.getUsers();
+		}
+
 		return result;
 	}
 
@@ -105,6 +115,15 @@ public class Core {
 		List<Post> result = new ArrayList<Post>();
 
 		result = pm.getPosts();
+
+		if (result.isEmpty()) {
+			Post post = new Post();
+			post.setDate(calendar.getTime());
+			post.setTitle("Hello World");
+			post.setText("Welcome to you new blog!");
+			pm.createPost(post);
+			result = pm.getPosts();
+		}
 
 		return result;
 	}

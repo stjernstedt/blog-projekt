@@ -40,7 +40,7 @@ public class PostManager {
 	}
 	
 	// editera inlägg
-	public void editPost(int postId, String title, String text, Calendar date, int userId) {
+	public void editPost(int postId, String title, String text, int userId) {
 		EntityManager em = connection.getEntityManager();
 		
 		em.getTransaction().begin();
@@ -49,7 +49,6 @@ public class PostManager {
 			post.setPostId(postId);
 			post.setTitle(title);
 			post.setText(text);
-//			post.setDate(date);
 			post.setUserId(userId);
 			em.getTransaction().commit();
 		} finally {

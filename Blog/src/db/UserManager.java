@@ -42,6 +42,8 @@ public class UserManager {
 		return user;
 	}
 	
+	
+	// ändrar en användare
 	public void editUser(int userId, String username, String password, String email, int usertype) {
 		EntityManager em = connection.getEntityManager();
 		
@@ -97,6 +99,7 @@ public class UserManager {
 		return user;
 	}
 	
+	// söker efter en användare via användarnamn
 	public User searchUser(String search) {
 		EntityManager em = connection.getEntityManager();
 		User user = null;
