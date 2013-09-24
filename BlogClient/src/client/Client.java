@@ -58,6 +58,7 @@ public class Client implements ActionListener {
 	private JFrame CUWindow;
 	private JFrame loginWindow;
 	private JFrame EUWindow;
+	private JFrame EPWindow;
 
 	private Dimension knappDim = new Dimension(150, 25);
 
@@ -382,10 +383,12 @@ public class Client implements ActionListener {
 		createPost.addActionListener(this);
 		removePost.addActionListener(this);
 		showPosts.addActionListener(this);
+		updatePost.addActionListener(this);
 
 		createPost.setActionCommand("openCP");
 		removePost.setActionCommand("removePost");
 		showPosts.setActionCommand("showPosts");
+		updatePost.setActionCommand("openEP");
 
 		MPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		MPWindow.setResizable(false);
@@ -493,6 +496,55 @@ public class Client implements ActionListener {
 		CPWindow.setVisible(true);
 	}
 
+	// skapar fönstret för att ändra på inlägg.
+	private void editPostWindow(Post post) {
+		EPWindow = new JFrame("Edit Post");
+		Container EPcontent = EPWindow.getContentPane();
+
+		JButton EPbutton = new JButton("Apply changes");
+		EPbutton.addActionListener(this);
+		EPbutton.setActionCommand("editPost");
+
+		EPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		EPWindow.setResizable(false);
+		EPWindow.setLayout(lm);
+
+		postTextArea.setBorder(border);
+		postTextArea.setLineWrap(true);
+
+		JLabel EPlabel1 = new JLabel("Title");
+		JLabel EPlabel2 = new JLabel("Text");
+		postTitleField.setText(post.getTitle());
+		postTextArea.setText(post.getText());
+
+		resetConstraints();
+		c.insets = new Insets(5, 5, 5, 5);
+		c.weightx = 0.5;
+		c.weighty = 0.1;
+		c.gridx = 0;
+		c.gridy = 0;
+		EPcontent.add(EPlabel1, c);
+		c.gridy = 1;
+		EPcontent.add(EPlabel2, c);
+
+		c.gridx = 1;
+		c.gridy = 0;
+
+		EPcontent.add(postTitleField, c);
+		c.gridy = 1;
+		EPcontent.add(postTextArea, c);
+
+		c.anchor = GridBagConstraints.LINE_END;
+		c.weightx = 0.1;
+		c.gridy = 2;
+		EPcontent.add(EPbutton, c);
+
+		EPWindow.pack();
+		EPWindow.setLocationRelativeTo(null);
+		EPWindow.setVisible(true);
+
+	}
+
 	// skapar login fönster
 	private void loginWindow() {
 		loginWindow = new JFrame("Login");
@@ -573,6 +625,14 @@ public class Client implements ActionListener {
 							.toString())));
 		}
 
+		if ("openEP".equals(e.getActionCommand())) {
+			editPostWindow(pm.getPost(
+					server,
+					Integer.parseInt(postsTable.getModel()
+							.getValueAt(postsTable.getSelectedRow(), 0)
+							.toString())));
+		}
+
 		if ("createUser".equals(e.getActionCommand())) {
 			um.createUser(server, usernameField.getText(),
 					passwordField.getText(), emailField.getText(),
@@ -622,6 +682,20 @@ public class Client implements ActionListener {
 			postTextArea.setText("");
 			JOptionPane.showMessageDialog(null, "Post created!");
 			updatePostsTable();
+		}
+
+		if ("editPost".equals(e.getActionCommand())) {
+			pm.editPost(
+					server,
+					Integer.parseInt(postsModel.getValueAt(
+							postsTable.getSelectedRow(), 0).toString()),
+					postTitleField.getText(), postTextArea.getText());
+			EPWindow.dispose();
+			postTitleField.setText("");
+			postTextArea.setText("");
+			JOptionPane.showMessageDialog(null, "Post updated!");
+			updatePostsTable();
+
 		}
 
 		if ("removePost".equals(e.getActionCommand())) {
