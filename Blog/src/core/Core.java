@@ -101,12 +101,22 @@ public class Core {
 		pm.createPost(post);
 
 	}
+	
+	//ändrar ett inlägg
+	public void editPost(int postId, String title, String text) {
+		pm.editPost(postId, title, text);
+	}
 
 	// tar bort ett inlägg
 	public void removePost(int postId) {
 		pm.removePost(postId);
 	}
-
+	
+	//hämtar ett inlägg
+	public Post getPost(int postId) {
+		return pm.getPost(postId);
+	}
+	
 	// hämtar alla inlägg
 	public List<Post> getPosts() {
 		List<Post> result = new ArrayList<Post>();

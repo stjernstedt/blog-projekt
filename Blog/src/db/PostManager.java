@@ -39,16 +39,16 @@ public class PostManager {
 	}
 	
 	// editera inlägg
-	public void editPost(int postId, String title, String text, int userId) {
+	public void editPost(int postId, String title, String text) {
 		EntityManager em = connection.getEntityManager();
 		
 		em.getTransaction().begin();
 		try {
-			Post post = em.find(Post.class, userId);
+			Post post = em.find(Post.class, postId);
 			post.setPostId(postId);
 			post.setTitle(title);
 			post.setText(text);
-			post.setUserId(userId);
+			//post.setUserId(userId);
 			em.getTransaction().commit();
 		} finally {
 			if (em.getTransaction().isActive())
