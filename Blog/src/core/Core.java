@@ -21,6 +21,7 @@ public class Core {
 	private UserManager um = UserManager.getInstance();
 	private PostManager pm = PostManager.getInstance();
 	private Calendar calendar = Calendar.getInstance();
+	private CommentManager cm = CommentManager.getInstance();
 
 	// login metod
 	public String login(String username, String password) {
@@ -127,7 +128,7 @@ public class Core {
 			Post post = new Post();
 			post.setDate(calendar.getTime());
 			post.setTitle("Hello World");
-			post.setText("Welcome to you new blog!");
+			post.setText("Welcome to your new blog!");
 			pm.createPost(post);
 			result = pm.getPosts();
 		}
@@ -139,7 +140,7 @@ public class Core {
 	public void createComment(String email, String text, String name,
 			Date date, int userID) {
 		Comment comment = new Comment();
-		CommentManager commentManager = CommentManager.getInstance();
+		
 
 		comment.setEmail(email);
 		comment.setName(name);
@@ -147,7 +148,11 @@ public class Core {
 		comment.setUserId(userID);
 		comment.setDate(calendar.getTime());
 
-		commentManager.createComment(comment);
+		cm.createComment(comment);
 	}
-
+	
+	// tar bort en kommentar
+	public void removeComment(int commentID) {
+		cm.removeComment(commentID);
+	}
 }

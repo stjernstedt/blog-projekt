@@ -32,4 +32,19 @@ public class CommentManager {
 
 		return comment;
 	}
+
+	public void removeComment(int commentID) {
+		EntityManager em = connection.getEntityManager();
+
+		em.getTransaction().begin();
+		try {
+			Comment comment = em.find(Comment.class, commentID);
+			em.remove(comment);
+			em.getTransaction().commit();
+		} finally {
+			if (em.getTransaction().isActive())
+				em.getTransaction().rollback();
+			em.close();
+		}
+	}
 }

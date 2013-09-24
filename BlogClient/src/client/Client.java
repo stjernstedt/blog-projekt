@@ -544,6 +544,10 @@ public class Client implements ActionListener {
 		EPWindow.setVisible(true);
 
 	}
+	
+	// skapar fönster för kommentarer
+	
+	
 
 	// skapar login fönster
 	private void loginWindow() {
