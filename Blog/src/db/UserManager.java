@@ -12,13 +12,11 @@ import data.User;
 
 public class UserManager {
 
-	private static DatabaseConnection connection;
 	private static UserManager userManager = new UserManager();
 
 	private static Logger logg = Logger.getLogger("userManager");
 
 	private UserManager() {
-		connection = DatabaseConnection.getInstance();
 	}
 
 	public static UserManager getInstance() {
@@ -27,7 +25,7 @@ public class UserManager {
 
 	// sparar en användare i databasen
 	public User createUser(User user) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 		em.getTransaction().begin();
 
 		try {
@@ -45,7 +43,7 @@ public class UserManager {
 	
 	// ändrar en användare
 	public void editUser(int userId, String username, String password, String email, int usertype) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 		
 		em.getTransaction().begin();
 		try {
@@ -64,7 +62,7 @@ public class UserManager {
 
 	// hämtar alla användare från databasen
 	public List<User> getUsers() {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 		List<User> allUsers = new ArrayList<User>();
 
 		em.getTransaction().begin();
@@ -84,7 +82,7 @@ public class UserManager {
 
 	// hämtar en specifik användare
 	public User getUser(int userId) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 		User user = null;
 
 		em.getTransaction().begin();
@@ -101,7 +99,7 @@ public class UserManager {
 	
 	// söker efter en användare via användarnamn
 	public User searchUser(String search) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 		User user = null;
 
 		em.getTransaction().begin();
@@ -121,7 +119,7 @@ public class UserManager {
 
 	// tar bort en användare
 	public void removeUser(int userId) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 
 		em.getTransaction().begin();
 		try {

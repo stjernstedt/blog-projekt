@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -63,7 +62,7 @@ public class Client implements ActionListener {
 	private Dimension knappDim = new Dimension(150, 25);
 
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat(
-			"yyyy/MM/dd HH:mm:ss");
+			"yyyy-MM-dd HH:mm:ss");
 
 	private Border border = BorderFactory
 			.createEtchedBorder(EtchedBorder.LOWERED);
@@ -495,6 +494,46 @@ public class Client implements ActionListener {
 		CPWindow.setLocationRelativeTo(null);
 		CPWindow.setVisible(true);
 	}
+	
+	// skapar ett fönster och visar alla inlägg
+	private void showPosts() {
+		Post[] posts = pm.getPosts(server);
+		JFrame postsWindow = new JFrame("test");
+		postsWindow.setLayout(lm);
+		JPanel pane = new JPanel();
+		pane.setLayout(lm);
+
+		JScrollPane scroll = new JScrollPane(pane);
+		pane.setAutoscrolls(true);
+		scroll.setPreferredSize(new Dimension(500, 700));
+		scroll.getVerticalScrollBar().setUnitIncrement(10);
+		postsWindow.add(scroll);
+
+		ArrayList<JTextField> fields = new ArrayList<JTextField>();
+		ArrayList<JTextArea> areas = new ArrayList<JTextArea>();
+
+		int i = 0;
+		resetConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		for (Post post : posts) {
+			fields.add(new JTextField(post.getTitle(), 43));
+			fields.get(i).setEditable(false);
+
+			areas.add(new JTextArea(post.getText(), 20, 43));
+			areas.get(i).setEditable(false);
+			areas.get(i).setLineWrap(true);
+			c.gridy += 1;
+			pane.add(fields.get(i), c);
+			c.gridy += 2;
+			pane.add(areas.get(i), c);
+			i++;
+		}
+
+		postsWindow.pack();
+		postsWindow.setLocationRelativeTo(null);
+		postsWindow.setVisible(true);
+	}
 
 	// skapar fönstret för att ändra på inlägg.
 	private void editPostWindow(Post post) {
@@ -722,42 +761,7 @@ public class Client implements ActionListener {
 		}
 
 		if ("showPosts".equals(e.getActionCommand())) {
-			Post[] posts = pm.getPosts(server);
-			JFrame test = new JFrame("test");
-			test.setLayout(lm);
-			JPanel pane = new JPanel();
-			pane.setLayout(lm);
-
-			JScrollPane scroll = new JScrollPane(pane);
-			pane.setAutoscrolls(true);
-			scroll.setPreferredSize(new Dimension(500, 700));
-			scroll.getVerticalScrollBar().setUnitIncrement(10);
-			test.add(scroll);
-
-			ArrayList<JTextField> fields = new ArrayList<JTextField>();
-			ArrayList<JTextArea> areas = new ArrayList<JTextArea>();
-
-			int i = 0;
-			resetConstraints();
-			c.gridx = 0;
-			c.gridy = 0;
-			for (Post post : posts) {
-				fields.add(new JTextField(post.getTitle(), 43));
-				fields.get(i).setEditable(false);
-
-				areas.add(new JTextArea(post.getText(), 20, 43));
-				areas.get(i).setEditable(false);
-				areas.get(i).setLineWrap(true);
-				c.gridy += 1;
-				pane.add(fields.get(i), c);
-				c.gridy += 2;
-				pane.add(areas.get(i), c);
-				i++;
-			}
-
-			test.pack();
-			test.setLocationRelativeTo(null);
-			test.setVisible(true);
+			showPosts();
 		}
 
 	}

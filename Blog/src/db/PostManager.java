@@ -4,26 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
+import javax.servlet.ServletContext;
+
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.http.HTTPConstants;
 
 import data.Post;
 
 public class PostManager {
 
-	private static DatabaseConnection connection;
 	private static PostManager postManager = new PostManager();
 
 	private PostManager() {
-		connection = DatabaseConnection.getInstance();
 	}
 
 	public static PostManager getInstance() {
 		return postManager;
 	}
-
+	
 	// sparar ett inlägg i databasen
 	public Post createPost(Post post) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 		em.getTransaction().begin();
 
 		try {
@@ -40,7 +43,7 @@ public class PostManager {
 	
 	// editera inlägg
 	public void editPost(int postId, String title, String text) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 		
 		em.getTransaction().begin();
 		try {
@@ -60,7 +63,7 @@ public class PostManager {
 
 	// tar bort ett inlägg
 	public void removePost(int postId) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 
 		em.getTransaction().begin();
 		try {
@@ -76,7 +79,8 @@ public class PostManager {
 
 	// hämtar alla inlägg
 	public List<Post> getPosts() {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
+
 		List<Post> allPosts = new ArrayList<Post>();
 
 		em.getTransaction().begin();
@@ -95,7 +99,7 @@ public class PostManager {
 
 	// hämtar specifikt inlägg
 	public Post getPost(int postId) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 		Post post = null;
 
 		em.getTransaction().begin();
