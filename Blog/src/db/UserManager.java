@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
@@ -39,12 +40,12 @@ public class UserManager {
 
 		return user;
 	}
-	
-	
+
 	// ändrar en användare
-	public void editUser(int userId, String username, String password, String email, int usertype) {
+	public void editUser(int userId, String username, String password,
+			String email, int usertype) {
 		EntityManager em = DatabaseConnection.getEntityManager();
-		
+
 		em.getTransaction().begin();
 		try {
 			User user = em.find(User.class, userId);
@@ -96,7 +97,7 @@ public class UserManager {
 		}
 		return user;
 	}
-	
+
 	// söker efter en användare via användarnamn
 	public User searchUser(String search) {
 		EntityManager em = DatabaseConnection.getEntityManager();
@@ -109,11 +110,14 @@ public class UserManager {
 					User.class);
 			user = q.setParameter("search", search).getSingleResult();
 			em.getTransaction().commit();
+		} catch (NoResultException e) {
+			
 		} finally {
-			if (em.getTransaction().isActive())
+		if (em.getTransaction().isActive())
 				em.getTransaction().rollback();
 			em.close();
 		}
+		logg.info(user);
 		return user;
 	}
 

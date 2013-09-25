@@ -32,6 +32,7 @@ public class Core {
 		if (user.getPassword().equals(password)) {
 			Session session = new Session();
 			UUID sessID = session.getSessID();
+			session.setUserType(user.getUsertype());
 			return sessID.toString();
 		} else {
 			return "error";
@@ -88,6 +89,11 @@ public class Core {
 	// hämtar en användare
 	public User getUser(int userId) {
 		return um.getUser(userId);
+	}
+	
+	// söker efter användare via användarnamn
+	public User searchUser(String username) {
+		return um.searchUser(username);
 	}
 
 	// skapar ett inlägg

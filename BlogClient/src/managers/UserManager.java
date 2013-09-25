@@ -9,6 +9,8 @@ import core.CoreStub.GetUser;
 import core.CoreStub.GetUserResponse;
 import core.CoreStub.GetUsers;
 import core.CoreStub.GetUsersResponse;
+import core.CoreStub.SearchUser;
+import core.CoreStub.SearchUserResponse;
 import core.CoreStub.User;
 
 public class UserManager {
@@ -42,6 +44,23 @@ public class UserManager {
 			System.exit(-2);
 		}
 
+		return result.get_return();
+	}
+	
+	public User searchUser(CoreStub server, String username) {
+		SearchUser arg = new SearchUser();
+		SearchUserResponse result = null;
+		
+		arg.setUsername(username);
+		
+		try {
+			result = server.searchUser(arg);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			System.err.println(e.getLocalizedMessage());
+			System.exit(-2);
+		}
+		
 		return result.get_return();
 	}
 

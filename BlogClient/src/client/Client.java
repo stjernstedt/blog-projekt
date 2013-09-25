@@ -134,6 +134,7 @@ public class Client implements ActionListener {
 		mainContent.add(managePosts, c);
 		c.gridy = 2;
 		mainContent.add(manageUsers, c);
+		c.gridy = 3;
 
 		window.pack();
 		window.setLocationRelativeTo(null); // centrerar fönstret
@@ -235,7 +236,6 @@ public class Client implements ActionListener {
 		MUWindow.pack();
 		MUWindow.setLocationRelativeTo(null);
 		MUWindow.setVisible(true);
-
 	}
 
 	// uppdaterar tabellen med användare
@@ -494,7 +494,7 @@ public class Client implements ActionListener {
 		CPWindow.setLocationRelativeTo(null);
 		CPWindow.setVisible(true);
 	}
-	
+
 	// skapar ett fönster och visar alla inlägg
 	private void showPosts() {
 		Post[] posts = pm.getPosts(server);
@@ -583,21 +583,19 @@ public class Client implements ActionListener {
 		EPWindow.setVisible(true);
 
 	}
-	
+
 	// skapar fönster för kommentarer
-	
-	
 
 	// skapar login fönster
 	private void loginWindow() {
 		loginWindow = new JFrame("Login");
 		Container loginContent = loginWindow.getContentPane();
 
-		JButton loginButton = new JButton("Login");
-
 		loginWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		loginWindow.setResizable(false);
 		loginWindow.setLayout(lm);
+
+		JButton loginButton = new JButton("Login");
 
 		JLabel loginLabel1 = new JLabel("Username:");
 		JLabel loginlabel2 = new JLabel("Password:");
@@ -611,7 +609,6 @@ public class Client implements ActionListener {
 		loginContent.add(loginLabel1, c);
 		c.gridy = 1;
 		loginContent.add(loginlabel2, c);
-
 		c.weightx = 1;
 		c.weighty = 1;
 		c.gridx = 1;
@@ -619,10 +616,10 @@ public class Client implements ActionListener {
 		loginContent.add(loginUsername, c);
 		c.gridy = 1;
 		loginContent.add(loginPassword, c);
-
 		c.anchor = GridBagConstraints.LINE_END;
 		c.gridy = 2;
 		loginContent.add(loginButton, c);
+
 		loginButton.addActionListener(this);
 		loginButton.setActionCommand("login");
 
@@ -677,15 +674,19 @@ public class Client implements ActionListener {
 		}
 
 		if ("createUser".equals(e.getActionCommand())) {
-			um.createUser(server, usernameField.getText(),
-					passwordField.getText(), emailField.getText(),
-					usertypeCombobox.getSelectedIndex());
-			CUWindow.dispose();
-			usernameField.setText("");
-			passwordField.setText("");
-			emailField.setText("");
-			JOptionPane.showMessageDialog(null, "User created!");
-			updateUsersTable();
+			if (um.searchUser(server, usernameField.getText()) != null) {
+				JOptionPane.showMessageDialog(null, "Username already exists!");
+			} else {
+				um.createUser(server, usernameField.getText(),
+						passwordField.getText(), emailField.getText(),
+						usertypeCombobox.getSelectedIndex());
+				CUWindow.dispose();
+				usernameField.setText("");
+				passwordField.setText("");
+				emailField.setText("");
+				JOptionPane.showMessageDialog(null, "User created!");
+				updateUsersTable();
+			}
 		}
 
 		if ("editUser".equals(e.getActionCommand())) {

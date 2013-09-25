@@ -6,11 +6,9 @@ import data.Comment;
 
 public class CommentManager {
 
-//	private static DatabaseConnection connection;
 	private static CommentManager commentManager = new CommentManager();
 
 	private CommentManager() {
-//		connection = DatabaseConnection.getInstance();
 	}
 
 	public static CommentManager getInstance() {
@@ -34,7 +32,7 @@ public class CommentManager {
 	}
 
 	public void removeComment(int commentID) {
-		EntityManager em = connection.getEntityManager();
+		EntityManager em = DatabaseConnection.getEntityManager();
 
 		em.getTransaction().begin();
 		try {

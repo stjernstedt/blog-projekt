@@ -1,6 +1,7 @@
 package data;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -14,13 +15,19 @@ public class Session implements Serializable {
 	@Id
 	private UUID sessID = UUID.randomUUID();
 	private User user; 
-	private long timeCreated = System.currentTimeMillis();
-	
+	private int userType;
+	private Calendar lastUse = Calendar.getInstance();
+
 	public Session() {
-		
+		updateLastUsed();
+	}
+	
+	private void updateLastUsed() {
+		lastUse.setTime(Calendar.getInstance().getTime());
 	}
 
 	public User getUser() {
+		updateLastUsed();
 		return user;
 	}
 
@@ -32,9 +39,15 @@ public class Session implements Serializable {
 		return sessID;
 	}
 
-	public long getTimeCreated() {
-		return timeCreated;
+	public Calendar lastUse() {
+		return lastUse;
 	}
 	
+	public void setUserType(int userType) {
+		this.userType = userType;
+	}
 	
+	public int getUserType() {
+		return userType;
+	}
 }
