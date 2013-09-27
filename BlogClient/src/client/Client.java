@@ -47,7 +47,7 @@ public class Client implements ActionListener {
 
 	private Logger logg = Logger.getLogger("Client Logger");
 	private CoreStub server = null;
-	private String session;
+	private String session = null;
 	private PostManager pm = new PostManager();
 	private UserManager um = new UserManager();
 	private CommentManager cm = new CommentManager();

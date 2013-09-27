@@ -13,6 +13,7 @@ import data.Session;
 import data.User;
 import db.CommentManager;
 import db.PostManager;
+import db.SessionManager;
 import db.UserManager;
 
 public class Core {
@@ -20,6 +21,7 @@ public class Core {
 	private Logger logg = Logger.getLogger("Core Logger");
 	private UserManager um = UserManager.getInstance();
 	private PostManager pm = PostManager.getInstance();
+	private SessionManager sm = SessionManager.getInstance();
 	private Calendar calendar = Calendar.getInstance();
 	private CommentManager cm = CommentManager.getInstance();
 
@@ -33,6 +35,7 @@ public class Core {
 			Session session = new Session();
 			UUID sessID = session.getSessID();
 			session.setUserType(user.getUsertype());
+			sm.createSession(session);
 			return sessID.toString();
 		} else {
 			return "error";
