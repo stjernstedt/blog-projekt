@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -105,6 +106,9 @@ public class Client implements ActionListener {
 	 */
 	public void start() {
 		Container mainContent = window.getContentPane();
+		JPanel mainPanel = new JPanel();
+		JTabbedPane tab1 = new JTabbedPane();
+		JTabbedPane tab2 = new JTabbedPane();
 
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
@@ -127,14 +131,18 @@ public class Client implements ActionListener {
 
 		mainContent.setLayout(lm);
 
-		resetConstraints();
-		c.insets = new Insets(5, 5, 5, 5);
-		mainContent.add(loginButton, c);
-		c.gridy = 1;
-		mainContent.add(managePosts, c);
-		c.gridy = 2;
-		mainContent.add(manageUsers, c);
-		c.gridy = 3;
+//		resetConstraints();
+//		c.insets = new Insets(5, 5, 5, 5);
+//		mainContent.add(loginButton, c);
+//		c.gridy = 1;
+//		mainContent.add(managePosts, c);
+//		c.gridy = 2;
+//		mainContent.add(manageUsers, c);
+//		c.gridy = 3;
+		
+		tab1.addTab("Manage Users", manageUsersWindow());
+		tab1.addTab("Manage Posts", managePostsWindow());
+		mainContent.add(tab1);
 
 		window.pack();
 		window.setLocationRelativeTo(null); // centrerar fönstret
@@ -177,10 +185,11 @@ public class Client implements ActionListener {
 	}
 
 	// hantera användare fönstret
-	private void manageUsersWindow() {
+	private JPanel manageUsersWindow() {
 		JFrame MUWindow = new JFrame("Manage Users");
 		Container MUcontent = MUWindow.getContentPane();
 		JPanel pane = new JPanel();
+		JPanel returnPane = new JPanel();
 
 		MUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		MUWindow.setResizable(false);
@@ -232,10 +241,13 @@ public class Client implements ActionListener {
 		editUser.setActionCommand("openEU");
 		removeUser.setActionCommand("removeUser");
 		createUser.setActionCommand("openCU");
+		
+		returnPane.add(MUcontent);
 
-		MUWindow.pack();
-		MUWindow.setLocationRelativeTo(null);
-		MUWindow.setVisible(true);
+//		MUWindow.pack();
+//		MUWindow.setLocationRelativeTo(null);
+//		MUWindow.setVisible(true);
+		return returnPane;
 	}
 
 	// uppdaterar tabellen med användare
@@ -364,10 +376,11 @@ public class Client implements ActionListener {
 	}
 
 	// hantera inlägg fönstret
-	private void managePostsWindow() {
+	private JPanel managePostsWindow() {
 		JFrame MPWindow = new JFrame("Manage Post");
 		Container MPcontent = MPWindow.getContentPane();
 		JPanel pane = new JPanel();
+		JPanel returnPane = new JPanel();
 
 		JButton updatePost = new JButton("Edit Post");
 		JButton showPosts = new JButton("Show Posts");
@@ -430,9 +443,11 @@ public class Client implements ActionListener {
 		c.gridheight = 5;
 		MPcontent.add(pane, c);
 
-		MPWindow.pack();
-		MPWindow.setLocationRelativeTo(null);
-		MPWindow.setVisible(true);
+		returnPane.add(MPcontent);
+		return returnPane;
+//		MPWindow.pack();
+//		MPWindow.setLocationRelativeTo(null);
+//		MPWindow.setVisible(true);
 
 	}
 
