@@ -19,6 +19,7 @@ public class Post implements Serializable {
 	private String text;
 	private Calendar date = Calendar.getInstance();
 	private int userId;
+	private int commentID;
 	
 	public Post() {
 		
@@ -62,6 +63,14 @@ public class Post implements Serializable {
 
 	public void setUserId(int userId) {
 		this.userId = userId;
+	}
+	
+	public int getCommentId() {
+		return commentID;
+	}
+	
+	public void setCommentId(int commentID) {
+		this.commentID = commentID;
 	}
 	
 	
