@@ -17,6 +17,7 @@ public class Session implements Serializable {
 	private String sessID = UUID.randomUUID().toString();
 	private String username;
 	private int userType;
+	private int userId;
 	private Calendar lastUse = Calendar.getInstance();
 
 	public Session() {
@@ -48,5 +49,13 @@ public class Session implements Serializable {
 	
 	public int getUserType() {
 		return userType;
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 }

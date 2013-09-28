@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
-import javax.servlet.ServletContext;
-
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.transport.http.HTTPConstants;
 
 import data.Post;
 
@@ -51,7 +46,6 @@ public class PostManager {
 			post.setPostId(postId);
 			post.setTitle(title);
 			post.setText(text);
-			//post.setUserId(userId);
 			em.getTransaction().commit();
 		} finally {
 			if (em.getTransaction().isActive())

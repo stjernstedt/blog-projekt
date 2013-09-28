@@ -1,13 +1,11 @@
 package managers;
 
 import java.rmi.RemoteException;
-import java.util.logging.Logger;
 
 import core.CoreStub;
 import core.CoreStub.GetSession;
 import core.CoreStub.GetSessionResponse;
 import core.CoreStub.Session;
-import core.CoreStub.User;
 
 public class SessionManager {
 	

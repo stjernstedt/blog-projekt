@@ -270,7 +270,7 @@ public class Client implements ActionListener {
 		JLabel label1 = new JLabel("Username:");
 		JLabel label2 = new JLabel("Password:");
 		JLabel label3 = new JLabel("Email:");
-		JLabel label4 = new JLabel("Usertype:");
+//		JLabel label4 = new JLabel("Usertype:");
 
 		JButton CUbutton = new JButton("Create User");
 		CUbutton.addActionListener(this);
@@ -445,10 +445,6 @@ public class Client implements ActionListener {
 
 		returnPane.add(MPcontent);
 		return returnPane;
-		// MPWindow.pack();
-		// MPWindow.setLocationRelativeTo(null);
-		// MPWindow.setVisible(true);
-
 	}
 
 	// uppdaterar tabellen med användare
@@ -458,7 +454,7 @@ public class Client implements ActionListener {
 		postsModel.setRowCount(0);
 		for (Post post : posts) {
 			postsModel.addRow(new Object[] { post.getPostId(), post.getTitle(),
-					post.getUserId(),
+					post.getUsername(),
 					dateFormatter.format(post.getDate().getTime()) });
 		}
 	}
@@ -740,7 +736,7 @@ public class Client implements ActionListener {
 
 		if ("createPost".equals(e.getActionCommand())) {
 			pm.createPost(server, postTitleField.getText(),
-					postTextArea.getText());
+					postTextArea.getText(), sm.getSession(server, session).getUsername());
 			CPWindow.dispose();
 			postTitleField.setText("");
 			postTextArea.setText("");
@@ -779,7 +775,7 @@ public class Client implements ActionListener {
 			session = login(loginUsername.getText(),
 					loginPassword.getPassword());
 			logg.info("får en sessionkey: " + session);
-			if (session != "error") {
+			if (!session.equals("error")) {
 				if (sm.getSession(server, session).getUserType() == 0) {
 					adminView();
 					loginWindow.dispose();
