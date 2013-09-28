@@ -33,8 +33,10 @@ public class Core {
 				+ "  user password: " + password);
 		if (user.getPassword().equals(password)) {
 			Session session = new Session();
-			UUID sessID = session.getSessID();
+			String sessID = session.getSessID();
 			session.setUserType(user.getUsertype());
+			session.setUsername(user.getUsername());
+			session.setLastUse(calendar.getTime());
 			sm.createSession(session);
 			return sessID.toString();
 		} else {
@@ -163,5 +165,9 @@ public class Core {
 	// tar bort en kommentar
 	public void removeComment(int commentID) {
 		cm.removeComment(commentID);
+	}
+	
+	public Session getSession(String session) {
+		return sm.getSession(session);
 	}
 }
