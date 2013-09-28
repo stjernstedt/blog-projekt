@@ -111,7 +111,7 @@ public class Client implements ActionListener {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
 		window.setLocationRelativeTo(null);
-		
+
 		loginWindow();
 	}
 
@@ -148,37 +148,37 @@ public class Client implements ActionListener {
 			System.err.println(e.getLocalizedMessage());
 			System.exit(-2);
 		}
-		logg.info("får svar: "+result.get_return());
+		logg.info("får svar: " + result.get_return());
 		return result.get_return();
 	}
-	
+
 	private void adminView() {
 		Container content = window.getContentPane();
 		JPanel mainContent = new JPanel();
 		JTabbedPane tabs = new JTabbedPane();
 
 		mainContent.setLayout(lm);
-		
+
 		tabs.addTab("Manage Users", manageUsersWindow());
 		tabs.addTab("Manage Posts", managePostsWindow());
 
 		mainContent.add(tabs);
 		content.add(mainContent);
-		
+
 		window.pack();
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
 	}
-	
+
 	private void userView() {
 		Container content = window.getContentPane();
 		JPanel mainContent = new JPanel();
 
 		mainContent.setLayout(lm);
-		
+
 		mainContent.add(managePostsWindow());
 		content.add(mainContent);
-		
+
 		window.pack();
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
@@ -241,12 +241,12 @@ public class Client implements ActionListener {
 		editUser.setActionCommand("openEU");
 		removeUser.setActionCommand("removeUser");
 		createUser.setActionCommand("openCU");
-		
+
 		returnPane.add(MUcontent);
 
-//		MUWindow.pack();
-//		MUWindow.setLocationRelativeTo(null);
-//		MUWindow.setVisible(true);
+		// MUWindow.pack();
+		// MUWindow.setLocationRelativeTo(null);
+		// MUWindow.setVisible(true);
 		return returnPane;
 	}
 
@@ -290,8 +290,8 @@ public class Client implements ActionListener {
 		CUcontent.add(label2, c);
 		c.gridy = 2;
 		CUcontent.add(label3, c);
-		c.gridy = 3;
-		CUcontent.add(label4, c);
+//		c.gridy = 3;
+//		CUcontent.add(label4, c);
 
 		c.gridx = 1;
 		c.gridy = 0;
@@ -300,9 +300,9 @@ public class Client implements ActionListener {
 		CUcontent.add(passwordField, c);
 		c.gridy = 2;
 		CUcontent.add(emailField, c);
-		c.gridy = 3;
-		usertypeCombobox.setSelectedIndex(1);
-		CUcontent.add(usertypeCombobox, c);
+//		c.gridy = 3;
+//		usertypeCombobox.setSelectedIndex(1);
+//		CUcontent.add(usertypeCombobox, c);
 
 		c.gridx = 2;
 		c.gridy = 4;
@@ -445,9 +445,9 @@ public class Client implements ActionListener {
 
 		returnPane.add(MPcontent);
 		return returnPane;
-//		MPWindow.pack();
-//		MPWindow.setLocationRelativeTo(null);
-//		MPWindow.setVisible(true);
+		// MPWindow.pack();
+		// MPWindow.setLocationRelativeTo(null);
+		// MPWindow.setVisible(true);
 
 	}
 
@@ -611,6 +611,7 @@ public class Client implements ActionListener {
 		loginWindow.setLayout(lm);
 
 		JButton loginButton = new JButton("Login");
+		JButton newUser = new JButton("Create User");
 
 		JLabel loginLabel1 = new JLabel("Username:");
 		JLabel loginlabel2 = new JLabel("Password:");
@@ -634,9 +635,13 @@ public class Client implements ActionListener {
 		c.anchor = GridBagConstraints.LINE_END;
 		c.gridy = 2;
 		loginContent.add(loginButton, c);
+		c.anchor = GridBagConstraints.LINE_START;
+		loginContent.add(newUser, c);
 
 		loginButton.addActionListener(this);
 		loginButton.setActionCommand("login");
+		newUser.addActionListener(this);
+		newUser.setActionCommand("openCU");
 
 		loginWindow.pack();
 		loginWindow.setLocationRelativeTo(null);
@@ -694,7 +699,7 @@ public class Client implements ActionListener {
 			} else {
 				um.createUser(server, usernameField.getText(),
 						passwordField.getText(), emailField.getText(),
-						usertypeCombobox.getSelectedIndex());
+						1);
 				CUWindow.dispose();
 				usernameField.setText("");
 				passwordField.setText("");
@@ -773,7 +778,7 @@ public class Client implements ActionListener {
 		if ("login".equals(e.getActionCommand())) {
 			session = login(loginUsername.getText(),
 					loginPassword.getPassword());
-			logg.info("får en sessionkey: "+session);
+			logg.info("får en sessionkey: " + session);
 			if (session != "error") {
 				if (sm.getSession(server, session).getUserType() == 0) {
 					adminView();
@@ -784,7 +789,8 @@ public class Client implements ActionListener {
 					window.setVisible(true);
 				}
 			} else {
-				JOptionPane.showMessageDialog(null, "Wrong username or password!");
+				JOptionPane.showMessageDialog(null,
+						"Wrong username or password!");
 			}
 		}
 

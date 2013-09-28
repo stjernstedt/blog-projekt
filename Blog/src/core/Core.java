@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import data.Comment;
@@ -24,7 +23,7 @@ public class Core {
 	private SessionManager sm = SessionManager.getInstance();
 	private Calendar calendar = Calendar.getInstance();
 	private CommentManager cm = CommentManager.getInstance();
-
+	
 	// login metod
 	public String login(String username, String password) {
 		logg.info(username + " " + password);
