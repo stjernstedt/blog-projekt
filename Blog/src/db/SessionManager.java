@@ -37,25 +37,25 @@ public class SessionManager {
 		}
 	}
 
-	public Session getSession(String uuid) {
+	public Session getSession(String sessionKey) {
 		EntityManager em = DatabaseConnection.getEntityManager();
 		Session session = null;
 		
-		logg.info("söker efter session: "+uuid);
+		logg.info("söker efter session: "+sessionKey);
 		em.getTransaction().begin();
 		try {
 			TypedQuery<Session> q = em
 					.createQuery(
 							"SELECT session FROM Session session WHERE session.sessID = :search",
 							Session.class);
-			session = q.setParameter("search", uuid).getSingleResult();
+			session = q.setParameter("search", sessionKey).getSingleResult();
 			em.getTransaction().commit();
 		} finally {
 			if (em.getTransaction().isActive())
 				em.getTransaction().rollback();
 			em.close();
 		}
-		logg.info("hittat session med uuid: "+session);
+		logg.info("hittat session med sessionKey: "+session);
 		return session;
 	}
 }

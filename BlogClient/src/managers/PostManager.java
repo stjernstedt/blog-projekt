@@ -1,6 +1,7 @@
 package managers;
 
 import java.rmi.RemoteException;
+import java.util.logging.Logger;
 
 import core.CoreStub;
 import core.CoreStub.CreatePost;
@@ -12,6 +13,8 @@ import core.CoreStub.GetPostsResponse;
 import core.CoreStub.Post;
 
 public class PostManager {
+
+	private static Logger logg = Logger.getLogger("postManager");
 
 	public void createPost(CoreStub server, String title, String text,
 			String username) {
@@ -27,9 +30,12 @@ public class PostManager {
 		}
 	}
 
-	public Post[] getPosts(CoreStub server) {
+	public Post[] getPosts(CoreStub server, String session) {
+		logg.info("postmanager session: " + session);
 		GetPosts arg = new GetPosts();
 		GetPostsResponse result = null;
+		
+		arg.setSessionKey(session);
 
 		try {
 			result = server.getPosts(arg);

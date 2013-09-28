@@ -406,7 +406,8 @@ public class Client implements ActionListener {
 		MPWindow.setResizable(false);
 		MPWindow.setLayout(lm);
 
-		Post[] posts = pm.getPosts(server);
+		logg.info("managePosts session: "+session);
+		Post[] posts = pm.getPosts(server, session);
 		String[] columnNames = { "PostID", "Title", "Author", "Date" };
 
 		postsTable = new JTable(posts.length, columnNames.length);
@@ -449,7 +450,8 @@ public class Client implements ActionListener {
 
 	// uppdaterar tabellen med användare
 	private void updatePostsTable() {
-		Post[] posts = pm.getPosts(server);
+		logg.info("updatePosts session: "+session);
+		Post[] posts = pm.getPosts(server, session);
 
 		postsModel.setRowCount(0);
 		for (Post post : posts) {
@@ -508,7 +510,7 @@ public class Client implements ActionListener {
 
 	// skapar ett fönster och visar alla inlägg
 	private void showPosts() {
-		Post[] posts = pm.getPosts(server);
+		Post[] posts = pm.getPosts(server, session);
 		JFrame postsWindow = new JFrame("test");
 		postsWindow.setLayout(lm);
 		JPanel pane = new JPanel();

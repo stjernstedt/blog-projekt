@@ -128,10 +128,12 @@ public class Core {
 	}
 
 	// hämtar alla inlägg
-	public List<Post> getPosts() {
+	public List<Post> getPosts(String sessionKey) {
+		logg.info("får getPosts anrop med session: "+sessionKey);
 		List<Post> result = new ArrayList<Post>();
 
-		result = pm.getPosts();
+		Session session = sm.getSession(sessionKey);
+		result = pm.getPosts(session.getUsername(), session.getUserType());
 
 		if (result.isEmpty()) {
 			Post post = new Post();
@@ -140,7 +142,8 @@ public class Core {
 			post.setText("Welcome to your new blog!");
 			post.setUsername("admin");
 			pm.createPost(post);
-			result = pm.getPosts();
+//			result = pm.getPosts(session.getUserId(), session.getUserType());
+			result.add(post);
 		}
 
 		return result;
@@ -167,6 +170,7 @@ public class Core {
 
 	// hämtar en session via sessionkey
 	public Session getSession(String session) {
+		logg.info("får getSession anrop");
 		return sm.getSession(session);
 	}
 }
