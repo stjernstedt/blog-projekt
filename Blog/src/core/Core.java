@@ -185,6 +185,17 @@ public class Core {
 
 		return result;
 	}
+	
+	public List<Comment> getPostComments(int postId) {
+		List<Comment> result = new ArrayList<Comment>();
+		
+		result = cm.getPostComments(postId);
+		
+//		if (result.isEmpty())
+//			return null;
+		
+		return result;
+	}
 
 	// hämtar en session via sessionkey
 	public Session getSession(String session) {

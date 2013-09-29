@@ -511,11 +511,14 @@ public class Client implements ActionListener {
 
 	// skapar ett fönster och visar alla inlägg
 	private void showPosts() {
-		Post[] posts = pm.getPosts(server, session);
 		JFrame postsWindow = new JFrame("test");
+
+		postsWindow.setResizable(false);
 		postsWindow.setLayout(lm);
 		JPanel pane = new JPanel();
 		pane.setLayout(lm);
+
+		Post[] posts = pm.getPosts(server, session);
 
 		JScrollPane scroll = new JScrollPane(pane);
 		pane.setAutoscrolls(true);
@@ -545,27 +548,29 @@ public class Client implements ActionListener {
 			commentButtons.get(i).putClientProperty("postId", post.getPostId());
 			commentButtons.get(i).addActionListener(this);
 			commentButtons.get(i).setActionCommand("openCC");
-			
+
 			viewCommentsButtons.add(new JButton("View Comments"));
-			viewCommentsButtons.get(i).putClientProperty("postId", post.getPostId());
+			viewCommentsButtons.get(i).putClientProperty("postId",
+					post.getPostId());
 			viewCommentsButtons.get(i).addActionListener(this);
 			viewCommentsButtons.get(i).setActionCommand("openVC");
-			
+
 			buttonsPanels.add(new JPanel());
 			buttonsPanels.get(i).setLayout(new FlowLayout());
 			buttonsPanels.get(i).add(viewCommentsButtons.get(i), c);
 			buttonsPanels.get(i).add(commentButtons.get(i), c);
 
 			c.gridy += 1;
+			fields.get(i).setBorder(border);
 			pane.add(fields.get(i), c);
 			c.gridy += 2;
+			areas.get(i).setBorder(border);
 			pane.add(areas.get(i), c);
 			c.gridy += 3;
 			c.anchor = GridBagConstraints.LINE_END;
+			c.insets = new Insets(0, 0, 5, 0);
 			pane.add(buttonsPanels.get(i), c);
 			c.anchor = 10;
-			c.gridy += 4;
-			pane.add(new JSeparator(SwingConstants.HORIZONTAL), c);
 
 			i++;
 		}
@@ -741,10 +746,62 @@ public class Client implements ActionListener {
 
 		commentsModel.setRowCount(0);
 		for (Comment comment : comments) {
-			commentsModel.addRow(new Object[] { comment.getCommentID(),
+			commentsModel.addRow(new Object[] { comment.getCommentId(),
 					comment.getName(), comment.getEmail(), comment.getText(),
 					comment.getPostId() });
 		}
+	}
+
+	private void showComments(int postId) {
+		JFrame commentsWindow = new JFrame("Comments");
+
+		commentsWindow.setResizable(false);
+		commentsWindow.setLayout(lm);
+		JPanel pane = new JPanel();
+		pane.setLayout(lm);
+		Comment[] comments = null;
+
+		try {
+			comments = cm.getPostComments(server, postId);
+		} catch (Exception e) {
+				commentsWindow.dispose();
+				JOptionPane.showMessageDialog(null, "No comments yet!");
+		}
+		JScrollPane scroll = new JScrollPane(pane);
+		pane.setAutoscrolls(true);
+		scroll.setPreferredSize(new Dimension(500, 700));
+		scroll.getVerticalScrollBar().setUnitIncrement(10);
+		commentsWindow.add(scroll);
+
+		ArrayList<JTextField> fields = new ArrayList<JTextField>();
+		ArrayList<JTextArea> areas = new ArrayList<JTextArea>();
+
+		int i = 0;
+		resetConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		for (Comment comment : comments) {
+			fields.add(new JTextField(comment.getName(), 43));
+			fields.get(i).setEditable(false);
+
+			areas.add(new JTextArea(comment.getText(), 20, 43));
+			areas.get(i).setEditable(false);
+			areas.get(i).setLineWrap(true);
+
+			c.gridy += 1;
+			fields.get(i).setBorder(border);
+			pane.add(fields.get(i), c);
+			c.gridy += 2;
+			c.insets = new Insets(0, 0, 5, 0);
+			areas.get(i).setBorder(border);
+			pane.add(areas.get(i), c);
+
+			i++;
+		}
+
+		commentsWindow.pack();
+		commentsWindow.setLocationRelativeTo(null);
+		commentsWindow.setVisible(true);
 	}
 
 	// skapar login fönster
@@ -829,6 +886,11 @@ public class Client implements ActionListener {
 			createCommentWindow(postId);
 		}
 
+		if ("openVC".equals(e.getActionCommand())) {
+			JButton temp = (JButton) e.getSource();
+			showComments((int) temp.getClientProperty("postId"));
+		}
+
 		if ("openEU".equals(e.getActionCommand())) {
 			editUserWindow(um.getUser(server, (int) usersTable.getModel()
 					.getValueAt(usersTable.getSelectedRow(), 0)));
@@ -906,14 +968,16 @@ public class Client implements ActionListener {
 		}
 
 		if ("removePost".equals(e.getActionCommand())) {
-			pm.removePost(server, (int) postsModel.getValueAt(postsTable.getSelectedRow(), 0));
+			pm.removePost(server,
+					(int) postsModel.getValueAt(postsTable.getSelectedRow(), 0));
 			updatePostsTable();
 		}
 
 		if ("createComment".equals(e.getActionCommand())) {
 			JButton temp = (JButton) e.getSource();
 			cm.createComment(server, emailField.getText(),
-					commentTextArea.getText(), usernameField.getText(), (int) temp.getClientProperty("postId"));
+					commentTextArea.getText(), usernameField.getText(),
+					(int) temp.getClientProperty("postId"));
 			CCWindow.dispose();
 			emailField.setText("");
 			commentTextArea.setText("");
@@ -921,9 +985,12 @@ public class Client implements ActionListener {
 			JOptionPane.showMessageDialog(null, "Comment Created");
 			updateCommentsTable();
 		}
-		
-		if("removeComment".equals(e.getActionCommand())) {
-			cm.removeComment(server, (int) commentsModel.getValueAt(commentsTable.getSelectedRow(), 0));
+
+		if ("removeComment".equals(e.getActionCommand())) {
+			cm.removeComment(
+					server,
+					(int) commentsModel.getValueAt(
+							commentsTable.getSelectedRow(), 0));
 			updateCommentsTable();
 		}
 

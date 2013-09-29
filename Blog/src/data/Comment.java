@@ -12,7 +12,7 @@ public class Comment implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id @GeneratedValue
-	private int commentID;
+	private int commentId;
 	private String email;
 	private String text;
 	private String name;
@@ -23,12 +23,12 @@ public class Comment implements Serializable {
 		
 	}
 
-	public int getCommentID() {
-		return commentID;
+	public int getCommentId() {
+		return commentId;
 	}
 
-	public void setCommentID(int commentID) {
-		this.commentID = commentID;
+	public void setCommentId(int commentId) {
+		this.commentId = commentId;
 	}
 
 	public String getEmail() {
