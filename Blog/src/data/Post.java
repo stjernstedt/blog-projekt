@@ -12,17 +12,17 @@ import javax.persistence.Id;
 public class Post implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
-	@Id @GeneratedValue
+
+	@Id
+	@GeneratedValue
 	private int postId;
 	private String title;
 	private String text;
 	private Calendar date = Calendar.getInstance();
 	private int userId;
-	private int commentID;
-	
+
 	public Post() {
-		
+
 	}
 
 	public int getPostId() {
@@ -64,15 +64,5 @@ public class Post implements Serializable {
 	public void setUserId(int userId) {
 		this.userId = userId;
 	}
-	
-	public int getCommentId() {
-		return commentID;
-	}
-	
-	public void setCommentId(int commentID) {
-		this.commentID = commentID;
-	}
-	
-	
-	
+
 }

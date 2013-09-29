@@ -59,6 +59,7 @@ public class Client implements ActionListener {
 	private JFrame loginWindow;
 	private JFrame EUWindow;
 	private JFrame EPWindow;
+	private JFrame CCWindow;
 
 	private Dimension knappDim = new Dimension(150, 25);
 
@@ -80,6 +81,7 @@ public class Client implements ActionListener {
 	private JPasswordField loginPassword = new JPasswordField(15);
 
 	private JTextArea postTextArea = new JTextArea(20, 80);
+	private JTextArea commentTextArea = new JTextArea(20, 80);
 
 	private String[] choices = { "Admin", "User", "Guest" };
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -131,15 +133,15 @@ public class Client implements ActionListener {
 
 		mainContent.setLayout(lm);
 
-//		resetConstraints();
-//		c.insets = new Insets(5, 5, 5, 5);
-//		mainContent.add(loginButton, c);
-//		c.gridy = 1;
-//		mainContent.add(managePosts, c);
-//		c.gridy = 2;
-//		mainContent.add(manageUsers, c);
-//		c.gridy = 3;
-		
+		// resetConstraints();
+		// c.insets = new Insets(5, 5, 5, 5);
+		// mainContent.add(loginButton, c);
+		// c.gridy = 1;
+		// mainContent.add(managePosts, c);
+		// c.gridy = 2;
+		// mainContent.add(manageUsers, c);
+		// c.gridy = 3;
+
 		tab1.addTab("Manage Users", manageUsersWindow());
 		tab1.addTab("Manage Posts", managePostsWindow());
 		mainContent.add(tab1);
@@ -241,12 +243,12 @@ public class Client implements ActionListener {
 		editUser.setActionCommand("openEU");
 		removeUser.setActionCommand("removeUser");
 		createUser.setActionCommand("openCU");
-		
+
 		returnPane.add(MUcontent);
 
-//		MUWindow.pack();
-//		MUWindow.setLocationRelativeTo(null);
-//		MUWindow.setVisible(true);
+		// MUWindow.pack();
+		// MUWindow.setLocationRelativeTo(null);
+		// MUWindow.setVisible(true);
 		return returnPane;
 	}
 
@@ -445,9 +447,9 @@ public class Client implements ActionListener {
 
 		returnPane.add(MPcontent);
 		return returnPane;
-//		MPWindow.pack();
-//		MPWindow.setLocationRelativeTo(null);
-//		MPWindow.setVisible(true);
+		// MPWindow.pack();
+		// MPWindow.setLocationRelativeTo(null);
+		// MPWindow.setVisible(true);
 
 	}
 
@@ -599,7 +601,48 @@ public class Client implements ActionListener {
 
 	}
 
-	// skapar fönster för kommentarer
+	// skapar fönstret för att göra kommentarer
+	private void createCommentWindow() {
+		CCWindow = new JFrame("Create Comment");
+		Container CCcontent = CCWindow.getContentPane();
+
+		JButton CCbutton = new JButton("Post Comment");
+		CCbutton.addActionListener(this);
+
+		CCWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		CCWindow.setResizable(false);
+		CCWindow.setLayout(lm);
+
+		commentTextArea.setBorder(border);
+		commentTextArea.setLineWrap(true);
+
+		JLabel CClabel = new JLabel("Text");
+
+		resetConstraints();
+		c.insets = new Insets(5, 5, 5, 5);
+		c.weightx = 0.5;
+		c.weighty = 0.1;
+		c.gridx = 0;
+		c.gridy = 0;
+		CCcontent.add(CClabel, c);
+
+		c.gridx = 1;
+		c.gridy = 0;
+		CCcontent.add(commentTextArea, c);
+
+		c.anchor = GridBagConstraints.LINE_END;
+		c.weightx = 0.1;
+		c.gridy = 2;
+		CCcontent.add(CCbutton, c);
+
+		CCbutton.setActionCommand("createComment");
+		CCcontent.add(CCbutton, c);
+
+		CCWindow.pack();
+		CCWindow.setLocationRelativeTo(null);
+		CCWindow.setVisible(false);
+
+	}
 
 	// skapar login fönster
 	private void loginWindow() {
