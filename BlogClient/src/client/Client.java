@@ -2,6 +2,7 @@ package client;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -11,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -23,10 +24,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
@@ -39,10 +42,10 @@ import managers.UserManager;
 import org.apache.axis2.AxisFault;
 
 import core.CoreStub;
+import core.CoreStub.Comment;
 import core.CoreStub.Login;
 import core.CoreStub.LoginResponse;
 import core.CoreStub.Post;
-import core.CoreStub.RemovePost;
 import core.CoreStub.RemoveUser;
 import core.CoreStub.User;
 
@@ -75,6 +78,9 @@ public class Client implements ActionListener {
 	private LayoutManager lm = new GridBagLayout();
 	private GridBagConstraints c = new GridBagConstraints();
 
+	private List<JButton> commentButtons;
+	private List<JButton> viewCommentsButtons;
+
 	private JTextField usernameField = new JTextField(15);
 	private JTextField passwordField = new JTextField(15);
 	private JTextField emailField = new JTextField(15);
@@ -92,8 +98,10 @@ public class Client implements ActionListener {
 
 	private JTable usersTable;
 	private JTable postsTable;
+	private JTable commentsTable;
 	private DefaultTableModel usersModel = new DefaultTableModel();
 	private DefaultTableModel postsModel = new DefaultTableModel();
+	private DefaultTableModel commentsModel = new DefaultTableModel();
 
 	public static void main(String[] args) {
 
@@ -176,10 +184,14 @@ public class Client implements ActionListener {
 	private void userView() {
 		Container content = window.getContentPane();
 		JPanel mainContent = new JPanel();
+		JTabbedPane tabs = new JTabbedPane();
 
 		mainContent.setLayout(lm);
 
-		mainContent.add(managePostsWindow());
+		tabs.addTab("Manage Posts", managePostsWindow());
+		tabs.addTab("Manage Comments", manageCommentsWindow());
+
+		mainContent.add(tabs);
 		content.add(mainContent);
 
 		window.pack();
@@ -189,14 +201,10 @@ public class Client implements ActionListener {
 
 	// hantera användare fönstret
 	private JPanel manageUsersWindow() {
-		JFrame MUWindow = new JFrame("Manage Users");
-		Container MUcontent = MUWindow.getContentPane();
+		JPanel MUcontent = new JPanel();
 		JPanel pane = new JPanel();
-		JPanel returnPane = new JPanel();
 
-		MUWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		MUWindow.setResizable(false);
-		MUWindow.setLayout(lm);
+		MUcontent.setLayout(lm);
 
 		JButton createUser = new JButton("Create User");
 		JButton removeUser = new JButton("Remove User");
@@ -245,12 +253,7 @@ public class Client implements ActionListener {
 		removeUser.setActionCommand("removeUser");
 		createUser.setActionCommand("openCU");
 
-		returnPane.add(MUcontent);
-
-		// MUWindow.pack();
-		// MUWindow.setLocationRelativeTo(null);
-		// MUWindow.setVisible(true);
-		return returnPane;
+		return MUcontent;
 	}
 
 	// uppdaterar tabellen med användare
@@ -273,7 +276,7 @@ public class Client implements ActionListener {
 		JLabel label1 = new JLabel("Username:");
 		JLabel label2 = new JLabel("Password:");
 		JLabel label3 = new JLabel("Email:");
-//		JLabel label4 = new JLabel("Usertype:");
+		// JLabel label4 = new JLabel("Usertype:");
 
 		JButton CUbutton = new JButton("Create User");
 		CUbutton.addActionListener(this);
@@ -293,8 +296,8 @@ public class Client implements ActionListener {
 		CUcontent.add(label2, c);
 		c.gridy = 2;
 		CUcontent.add(label3, c);
-//		c.gridy = 3;
-//		CUcontent.add(label4, c);
+		// c.gridy = 3;
+		// CUcontent.add(label4, c);
 
 		c.gridx = 1;
 		c.gridy = 0;
@@ -303,9 +306,9 @@ public class Client implements ActionListener {
 		CUcontent.add(passwordField, c);
 		c.gridy = 2;
 		CUcontent.add(emailField, c);
-//		c.gridy = 3;
-//		usertypeCombobox.setSelectedIndex(1);
-//		CUcontent.add(usertypeCombobox, c);
+		// c.gridy = 3;
+		// usertypeCombobox.setSelectedIndex(1);
+		// CUcontent.add(usertypeCombobox, c);
 
 		c.gridx = 2;
 		c.gridy = 4;
@@ -380,10 +383,10 @@ public class Client implements ActionListener {
 
 	// hantera inlägg fönstret
 	private JPanel managePostsWindow() {
-		JFrame MPWindow = new JFrame("Manage Post");
-		Container MPcontent = MPWindow.getContentPane();
+		JPanel MPcontent = new JPanel();
 		JPanel pane = new JPanel();
-		JPanel returnPane = new JPanel();
+
+		MPcontent.setLayout(lm);
 
 		JButton updatePost = new JButton("Edit Post");
 		JButton showPosts = new JButton("Show Posts");
@@ -405,11 +408,7 @@ public class Client implements ActionListener {
 		showPosts.setActionCommand("showPosts");
 		updatePost.setActionCommand("openEP");
 
-		MPWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		MPWindow.setResizable(false);
-		MPWindow.setLayout(lm);
-
-		logg.info("managePosts session: "+session);
+		logg.info("managePosts session: " + session);
 		Post[] posts = pm.getPosts(server, session);
 		String[] columnNames = { "PostID", "Title", "Author", "Date" };
 
@@ -447,14 +446,12 @@ public class Client implements ActionListener {
 		c.gridheight = 5;
 		MPcontent.add(pane, c);
 
-		returnPane.add(MPcontent);
-		return returnPane;
-
+		return MPcontent;
 	}
 
 	// uppdaterar tabellen med användare
 	private void updatePostsTable() {
-		logg.info("updatePosts session: "+session);
+		logg.info("updatePosts session: " + session);
 		Post[] posts = pm.getPosts(server, session);
 
 		postsModel.setRowCount(0);
@@ -528,6 +525,9 @@ public class Client implements ActionListener {
 
 		ArrayList<JTextField> fields = new ArrayList<JTextField>();
 		ArrayList<JTextArea> areas = new ArrayList<JTextArea>();
+		commentButtons = new ArrayList<JButton>();
+		viewCommentsButtons = new ArrayList<JButton>();
+		List<JPanel> buttonsPanels = new ArrayList<JPanel>();
 
 		int i = 0;
 		resetConstraints();
@@ -540,10 +540,33 @@ public class Client implements ActionListener {
 			areas.add(new JTextArea(post.getText(), 20, 43));
 			areas.get(i).setEditable(false);
 			areas.get(i).setLineWrap(true);
+
+			commentButtons.add(new JButton("Comment"));
+			commentButtons.get(i).putClientProperty("postId", post.getPostId());
+			commentButtons.get(i).addActionListener(this);
+			commentButtons.get(i).setActionCommand("openCC");
+			
+			viewCommentsButtons.add(new JButton("View Comments"));
+			viewCommentsButtons.get(i).putClientProperty("postId", post.getPostId());
+			viewCommentsButtons.get(i).addActionListener(this);
+			viewCommentsButtons.get(i).setActionCommand("openVC");
+			
+			buttonsPanels.add(new JPanel());
+			buttonsPanels.get(i).setLayout(new FlowLayout());
+			buttonsPanels.get(i).add(viewCommentsButtons.get(i), c);
+			buttonsPanels.get(i).add(commentButtons.get(i), c);
+
 			c.gridy += 1;
 			pane.add(fields.get(i), c);
 			c.gridy += 2;
 			pane.add(areas.get(i), c);
+			c.gridy += 3;
+			c.anchor = GridBagConstraints.LINE_END;
+			pane.add(buttonsPanels.get(i), c);
+			c.anchor = 10;
+			c.gridy += 4;
+			pane.add(new JSeparator(SwingConstants.HORIZONTAL), c);
+
 			i++;
 		}
 
@@ -600,23 +623,70 @@ public class Client implements ActionListener {
 		EPWindow.setVisible(true);
 
 	}
-	//skapar fönstret för att hantera kommentarer
+
+	// skapar fönstret för att hantera kommentarer
 	private JPanel manageCommentsWindow() {
-		JPanel content = new JPanel();
-		JButton createCommentButton = new JButton("Create Comment");
-		content.add(createCommentButton);
-		createCommentButton.addActionListener(this);
-		createCommentButton.setActionCommand("openCC");
-		
-		return content;
+		JPanel MCcontent = new JPanel();
+		JPanel pane = new JPanel();
+
+		MCcontent.setLayout(lm);
+
+		JButton updateComment = new JButton("Edit Comment");
+		JButton removeComment = new JButton("Remove Comment");
+
+		updateComment.setPreferredSize(knappDim);
+		removeComment.setPreferredSize(knappDim);
+
+		removeComment.addActionListener(this);
+		updateComment.addActionListener(this);
+
+		removeComment.setActionCommand("removeComment");
+		updateComment.setActionCommand("openEC");
+
+		Comment[] comments = cm.getComments(server);
+		String[] columnNames = { "CommentId", "Name", "Email", "Comment",
+				"PostId" };
+
+		commentsTable = new JTable(comments.length, columnNames.length);
+		commentsTable.setModel(commentsModel);
+		commentsTable.setSelectionMode(0);
+
+		commentsModel.setColumnCount(0);
+		for (int i = 0; i < columnNames.length; i++) {
+			commentsModel.addColumn(columnNames[i]);
+		}
+		commentsTable.getColumnModel().getColumn(0).setPreferredWidth(1);
+		commentsTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+		commentsTable.getColumnModel().getColumn(2).setPreferredWidth(50);
+		commentsTable.getColumnModel().getColumn(3).setPreferredWidth(70);
+		updateCommentsTable();
+
+		JScrollPane scrollPane = new JScrollPane(commentsTable);
+		scrollPane.setPreferredSize(new Dimension(500, 500));
+		scrollPane.setAutoscrolls(true);
+
+		pane.add(scrollPane);
+
+		resetConstraints();
+		c.insets = new Insets(5, 5, 5, 5);
+		MCcontent.add(removeComment, c);
+		c.gridy = 1;
+		MCcontent.add(updateComment, c);
+		c.gridy = 0;
+		c.gridx = 1;
+		c.gridheight = 5;
+		MCcontent.add(pane, c);
+
+		return MCcontent;
 	}
-	
-	//skapar fönstret för att göra kommentarer
-	private void createCommentWindow() {
+
+	// skapar fönstret för att göra kommentarer
+	private void createCommentWindow(int postId) {
 		CCWindow = new JFrame("Create Comment");
 		Container CCcontent = CCWindow.getContentPane();
 
 		JButton CCbutton = new JButton("Post Comment");
+		CCbutton.putClientProperty("postId", postId);
 		CCbutton.addActionListener(this);
 
 		CCWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -641,7 +711,7 @@ public class Client implements ActionListener {
 		CCcontent.add(CClabel2, c);
 		c.gridy = 2;
 		CCcontent.add(CClabel3, c);
-		
+
 		c.gridy = 0;
 		c.gridx = 1;
 		c.anchor = GridBagConstraints.LINE_START;
@@ -664,6 +734,17 @@ public class Client implements ActionListener {
 		CCWindow.setLocationRelativeTo(null);
 		CCWindow.setVisible(true);
 
+	}
+
+	private void updateCommentsTable() {
+		Comment[] comments = cm.getComments(server);
+
+		commentsModel.setRowCount(0);
+		for (Comment comment : comments) {
+			commentsModel.addRow(new Object[] { comment.getCommentID(),
+					comment.getName(), comment.getEmail(), comment.getText(),
+					comment.getPostId() });
+		}
 	}
 
 	// skapar login fönster
@@ -741,24 +822,21 @@ public class Client implements ActionListener {
 
 		if ("openMP".equals(e.getActionCommand()))
 			managePostsWindow();
-		
-		if ("openCC".equals(e.getActionCommand()))
-			createCommentWindow();
+
+		if ("openCC".equals(e.getActionCommand())) {
+			JButton temp = (JButton) e.getSource();
+			int postId = (int) temp.getClientProperty("postId");
+			createCommentWindow(postId);
+		}
 
 		if ("openEU".equals(e.getActionCommand())) {
-			editUserWindow(um.getUser(
-					server,
-					Integer.parseInt(usersTable.getModel()
-							.getValueAt(usersTable.getSelectedRow(), 0)
-							.toString())));
+			editUserWindow(um.getUser(server, (int) usersTable.getModel()
+					.getValueAt(usersTable.getSelectedRow(), 0)));
 		}
 
 		if ("openEP".equals(e.getActionCommand())) {
-			editPostWindow(pm.getPost(
-					server,
-					Integer.parseInt(postsTable.getModel()
-							.getValueAt(postsTable.getSelectedRow(), 0)
-							.toString())));
+			editPostWindow(pm.getPost(server, (int) postsTable.getModel()
+					.getValueAt(postsTable.getSelectedRow(), 0)));
 		}
 
 		if ("createUser".equals(e.getActionCommand())) {
@@ -766,8 +844,7 @@ public class Client implements ActionListener {
 				JOptionPane.showMessageDialog(null, "Username already exists!");
 			} else {
 				um.createUser(server, usernameField.getText(),
-						passwordField.getText(), emailField.getText(),
-						1);
+						passwordField.getText(), emailField.getText(), 1);
 				CUWindow.dispose();
 				usernameField.setText("");
 				passwordField.setText("");
@@ -780,8 +857,7 @@ public class Client implements ActionListener {
 		if ("editUser".equals(e.getActionCommand())) {
 			um.editUser(
 					server,
-					Integer.parseInt(usersModel.getValueAt(
-							usersTable.getSelectedRow(), 0).toString()),
+					(int) usersModel.getValueAt(usersTable.getSelectedRow(), 0),
 					usernameField.getText(), passwordField.getText(),
 					emailField.getText(), usertypeCombobox.getSelectedIndex());
 			EUWindow.dispose();
@@ -794,8 +870,8 @@ public class Client implements ActionListener {
 
 		if ("removeUser".equals(e.getActionCommand())) {
 			RemoveUser arg = new RemoveUser();
-			arg.setUserId(Integer.parseInt(usersTable.getModel()
-					.getValueAt(usersTable.getSelectedRow(), 0).toString()));
+			arg.setUserId((int) usersTable.getModel().getValueAt(
+					usersTable.getSelectedRow(), 0));
 
 			try {
 				server.removeUser(arg);
@@ -807,8 +883,8 @@ public class Client implements ActionListener {
 		}
 
 		if ("createPost".equals(e.getActionCommand())) {
-			pm.createPost(server, postTitleField.getText(),
-					postTextArea.getText(), sm.getSession(server, session).getUsername());
+			pm.createPost(server, postTitleField.getText(), postTextArea
+					.getText(), sm.getSession(server, session).getUsername());
 			CPWindow.dispose();
 			postTitleField.setText("");
 			postTextArea.setText("");
@@ -819,8 +895,7 @@ public class Client implements ActionListener {
 		if ("editPost".equals(e.getActionCommand())) {
 			pm.editPost(
 					server,
-					Integer.parseInt(postsModel.getValueAt(
-							postsTable.getSelectedRow(), 0).toString()),
+					(int) postsModel.getValueAt(postsTable.getSelectedRow(), 0),
 					postTitleField.getText(), postTextArea.getText());
 			EPWindow.dispose();
 			postTitleField.setText("");
@@ -831,26 +906,25 @@ public class Client implements ActionListener {
 		}
 
 		if ("removePost".equals(e.getActionCommand())) {
-			RemovePost arg = new RemovePost();
-			arg.setPostId(Integer.parseInt(postsModel.getValueAt(
-					postsTable.getSelectedRow(), 0).toString()));
-
-			try {
-				server.removePost(arg);
-			} catch (RemoteException e1) {
-				e1.printStackTrace();
-			}
+			pm.removePost(server, (int) postsModel.getValueAt(postsTable.getSelectedRow(), 0));
 			updatePostsTable();
 		}
-		
-		if("createComment".equals(e.getActionCommand())) {
+
+		if ("createComment".equals(e.getActionCommand())) {
+			JButton temp = (JButton) e.getSource();
 			cm.createComment(server, emailField.getText(),
-					commentTextArea.getText(), usernameField.getText());
+					commentTextArea.getText(), usernameField.getText(), (int) temp.getClientProperty("postId"));
 			CCWindow.dispose();
 			emailField.setText("");
 			commentTextArea.setText("");
 			usernameField.setText("");
 			JOptionPane.showMessageDialog(null, "Comment Created");
+			updateCommentsTable();
+		}
+		
+		if("removeComment".equals(e.getActionCommand())) {
+			cm.removeComment(server, (int) commentsModel.getValueAt(commentsTable.getSelectedRow(), 0));
+			updateCommentsTable();
 		}
 
 		if ("login".equals(e.getActionCommand())) {

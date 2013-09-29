@@ -11,6 +11,7 @@ import core.CoreStub.GetPostResponse;
 import core.CoreStub.GetPosts;
 import core.CoreStub.GetPostsResponse;
 import core.CoreStub.Post;
+import core.CoreStub.RemovePost;
 
 public class PostManager {
 
@@ -74,6 +75,17 @@ public class PostManager {
 			server.editPost(post);
 		} catch (RemoteException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void removePost(CoreStub server, int postId) {
+		RemovePost arg = new RemovePost();
+		arg.setPostId(postId);
+
+		try {
+			server.removePost(arg);
+		} catch (RemoteException e1) {
+			e1.printStackTrace();
 		}
 	}
 }

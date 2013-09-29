@@ -129,7 +129,7 @@ public class Core {
 
 	// hämtar alla inlägg
 	public List<Post> getPosts(String sessionKey) {
-		logg.info("får getPosts anrop med session: "+sessionKey);
+		logg.info("får getPosts anrop med session: " + sessionKey);
 		List<Post> result = new ArrayList<Post>();
 
 		Session session = sm.getSession(sessionKey);
@@ -142,7 +142,7 @@ public class Core {
 			post.setText("Welcome to your new blog!");
 			post.setUsername("admin");
 			pm.createPost(post);
-//			result = pm.getPosts(session.getUserId(), session.getUserType());
+			// result = pm.getPosts(session.getUserId(), session.getUserType());
 			result.add(post);
 		}
 
@@ -150,8 +150,7 @@ public class Core {
 	}
 
 	// skapar en kommentar
-	public void createComment(String email, String text, String name,
-			Date date, int postId) {
+	public void createComment(String email, String text, String name, int postId) {
 		Comment comment = new Comment();
 
 		comment.setEmail(email);
@@ -166,6 +165,25 @@ public class Core {
 	// tar bort en kommentar
 	public void removeComment(int commentID) {
 		cm.removeComment(commentID);
+	}
+	
+	public List<Comment> getComments() {
+		List<Comment> result = new ArrayList<Comment>();
+
+		result = cm.getComments();
+
+		if (result.isEmpty()) {
+			Comment comment = new Comment();
+			comment.setDate(calendar.getTime());
+			comment.setName("admin");
+			comment.setPostId(0);
+			comment.setEmail("email");
+			comment.setText("Your first comment!");
+			cm.createComment(comment);
+			result = cm.getComments();
+		}
+
+		return result;
 	}
 
 	// hämtar en session via sessionkey
