@@ -84,7 +84,7 @@ public class Client implements ActionListener {
 	private JPasswordField loginPassword = new JPasswordField(15);
 
 	private JTextArea postTextArea = new JTextArea(20, 80);
-	private JTextArea commentTextArea = new JTextArea(20, 80);
+	private JTextArea commentTextArea = new JTextArea(10, 30);
 
 	private String[] choices = { "Admin", "User", "Guest" };
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -163,6 +163,7 @@ public class Client implements ActionListener {
 
 		tabs.addTab("Manage Users", manageUsersWindow());
 		tabs.addTab("Manage Posts", managePostsWindow());
+		tabs.addTab("Manage Comments", manageCommentsWindow());
 
 		mainContent.add(tabs);
 		content.add(mainContent);
@@ -599,8 +600,18 @@ public class Client implements ActionListener {
 		EPWindow.setVisible(true);
 
 	}
-
-	// skapar fönstret för att göra kommentarer
+	//skapar fönstret för att hantera kommentarer
+	private JPanel manageCommentsWindow() {
+		JPanel content = new JPanel();
+		JButton createCommentButton = new JButton("Create Comment");
+		content.add(createCommentButton);
+		createCommentButton.addActionListener(this);
+		createCommentButton.setActionCommand("openCC");
+		
+		return content;
+	}
+	
+	//skapar fönstret för att göra kommentarer
 	private void createCommentWindow() {
 		CCWindow = new JFrame("Create Comment");
 		Container CCcontent = CCWindow.getContentPane();
@@ -615,7 +626,9 @@ public class Client implements ActionListener {
 		commentTextArea.setBorder(border);
 		commentTextArea.setLineWrap(true);
 
-		JLabel CClabel = new JLabel("Text");
+		JLabel CClabel = new JLabel("Name");
+		JLabel CClabel2 = new JLabel("Email");
+		JLabel CClabel3 = new JLabel("Text");
 
 		resetConstraints();
 		c.insets = new Insets(5, 5, 5, 5);
@@ -624,14 +637,24 @@ public class Client implements ActionListener {
 		c.gridx = 0;
 		c.gridy = 0;
 		CCcontent.add(CClabel, c);
-
-		c.gridx = 1;
+		c.gridy = 1;
+		CCcontent.add(CClabel2, c);
+		c.gridy = 2;
+		CCcontent.add(CClabel3, c);
+		
 		c.gridy = 0;
+		c.gridx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		CCcontent.add(usernameField, c);
+		c.gridy = 1;
+		CCcontent.add(emailField, c);
+		c.gridx = 1;
+		c.gridy = 2;
 		CCcontent.add(commentTextArea, c);
 
 		c.anchor = GridBagConstraints.LINE_END;
 		c.weightx = 0.1;
-		c.gridy = 2;
+		c.gridy = 3;
 		CCcontent.add(CCbutton, c);
 
 		CCbutton.setActionCommand("createComment");
@@ -639,7 +662,7 @@ public class Client implements ActionListener {
 
 		CCWindow.pack();
 		CCWindow.setLocationRelativeTo(null);
-		CCWindow.setVisible(false);
+		CCWindow.setVisible(true);
 
 	}
 
@@ -718,6 +741,9 @@ public class Client implements ActionListener {
 
 		if ("openMP".equals(e.getActionCommand()))
 			managePostsWindow();
+		
+		if ("openCC".equals(e.getActionCommand()))
+			createCommentWindow();
 
 		if ("openEU".equals(e.getActionCommand())) {
 			editUserWindow(um.getUser(
@@ -815,6 +841,16 @@ public class Client implements ActionListener {
 				e1.printStackTrace();
 			}
 			updatePostsTable();
+		}
+		
+		if("createComment".equals(e.getActionCommand())) {
+			cm.createComment(server, emailField.getText(),
+					commentTextArea.getText(), usernameField.getText());
+			CCWindow.dispose();
+			emailField.setText("");
+			commentTextArea.setText("");
+			usernameField.setText("");
+			JOptionPane.showMessageDialog(null, "Comment Created");
 		}
 
 		if ("login".equals(e.getActionCommand())) {

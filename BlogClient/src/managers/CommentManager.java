@@ -8,14 +8,11 @@ import core.CoreStub.CreateComment;
 
 public class CommentManager {
 
-	public void createComment(CoreStub server, String email, String text, String name,
-			Date date, int userID) {
+	public void createComment(CoreStub server, String email, String text, String name) {
 		CreateComment comment = new CreateComment();
 		comment.setEmail(email);
 		comment.setName(name);
 		comment.setText(text);
-		comment.setDate(date);
-		comment.setUserID(userID);
 
 		try {
 			server.createComment(comment);

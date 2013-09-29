@@ -17,7 +17,7 @@ public class Comment implements Serializable {
 	private String text;
 	private String name;
 	private Date date;
-	private int userID;
+	private int postId;
 	
 	public Comment() {
 		
@@ -63,12 +63,11 @@ public class Comment implements Serializable {
 		this.date = date;
 	}
 	
-	public int getUserId() {
-		return userID;
+	public int getPostId() {
+		return postId;
 	}
 	
-	public void setUserId(int userID) {
-		this.userID = userID;
-	}
+	public void setPostId(int postId) {
+		this.postId = postId;	}
 	
 }

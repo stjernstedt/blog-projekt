@@ -151,13 +151,13 @@ public class Core {
 
 	// skapar en kommentar
 	public void createComment(String email, String text, String name,
-			Date date, int userID) {
+			Date date, int postId) {
 		Comment comment = new Comment();
 
 		comment.setEmail(email);
 		comment.setName(name);
 		comment.setText(text);
-		comment.setUserId(userID);
+		comment.setPostId(postId);
 		comment.setDate(calendar.getTime());
 
 		cm.createComment(comment);
