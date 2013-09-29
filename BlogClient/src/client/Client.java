@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -32,6 +33,7 @@ import javax.swing.table.DefaultTableModel;
 
 import managers.CommentManager;
 import managers.PostManager;
+import managers.SessionManager;
 import managers.UserManager;
 
 import org.apache.axis2.AxisFault;
@@ -52,6 +54,7 @@ public class Client implements ActionListener {
 	private PostManager pm = new PostManager();
 	private UserManager um = new UserManager();
 	private CommentManager cm = new CommentManager();
+	private SessionManager sm = new SessionManager();
 
 	private JFrame window = new JFrame("Blog Admin");
 	private JFrame CPWindow;
@@ -107,48 +110,11 @@ public class Client implements ActionListener {
 	 * Metoden start() Är det nya main(String[] args)
 	 */
 	public void start() {
-		Container mainContent = window.getContentPane();
-		JPanel mainPanel = new JPanel();
-		JTabbedPane tab1 = new JTabbedPane();
-		JTabbedPane tab2 = new JTabbedPane();
-
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
+		window.setLocationRelativeTo(null);
 
-		JButton manageUsers = new JButton("Manage Users");
-		JButton managePosts = new JButton("Manage Posts");
-		JButton loginButton = new JButton("Login");
-
-		// Sätter storleken på knapparna
-		loginButton.setPreferredSize(knappDim);
-		manageUsers.setPreferredSize(knappDim);
-		managePosts.setPreferredSize(knappDim);
-
-		loginButton.addActionListener(this);
-		loginButton.setActionCommand("openLogin");
-		manageUsers.addActionListener(this);
-		manageUsers.setActionCommand("openMU");
-		managePosts.addActionListener(this);
-		managePosts.setActionCommand("openMP");
-
-		mainContent.setLayout(lm);
-
-		// resetConstraints();
-		// c.insets = new Insets(5, 5, 5, 5);
-		// mainContent.add(loginButton, c);
-		// c.gridy = 1;
-		// mainContent.add(managePosts, c);
-		// c.gridy = 2;
-		// mainContent.add(manageUsers, c);
-		// c.gridy = 3;
-
-		tab1.addTab("Manage Users", manageUsersWindow());
-		tab1.addTab("Manage Posts", managePostsWindow());
-		mainContent.add(tab1);
-
-		window.pack();
-		window.setLocationRelativeTo(null); // centrerar fönstret
-		window.setVisible(true);
+		loginWindow();
 	}
 
 	private static CoreStub initializeServer() {
@@ -176,6 +142,7 @@ public class Client implements ActionListener {
 		arg.setUsername(username);
 		arg.setPassword(pwd);
 
+		logg.info("försöker skicka info");
 		try {
 			result = server.login(arg);
 		} catch (RemoteException e) {
@@ -183,7 +150,40 @@ public class Client implements ActionListener {
 			System.err.println(e.getLocalizedMessage());
 			System.exit(-2);
 		}
+		logg.info("får svar: " + result.get_return());
 		return result.get_return();
+	}
+
+	private void adminView() {
+		Container content = window.getContentPane();
+		JPanel mainContent = new JPanel();
+		JTabbedPane tabs = new JTabbedPane();
+
+		mainContent.setLayout(lm);
+
+		tabs.addTab("Manage Users", manageUsersWindow());
+		tabs.addTab("Manage Posts", managePostsWindow());
+
+		mainContent.add(tabs);
+		content.add(mainContent);
+
+		window.pack();
+		window.setLocationRelativeTo(null);
+		window.setVisible(true);
+	}
+
+	private void userView() {
+		Container content = window.getContentPane();
+		JPanel mainContent = new JPanel();
+
+		mainContent.setLayout(lm);
+
+		mainContent.add(managePostsWindow());
+		content.add(mainContent);
+
+		window.pack();
+		window.setLocationRelativeTo(null);
+		window.setVisible(true);
 	}
 
 	// hantera användare fönstret
@@ -272,7 +272,7 @@ public class Client implements ActionListener {
 		JLabel label1 = new JLabel("Username:");
 		JLabel label2 = new JLabel("Password:");
 		JLabel label3 = new JLabel("Email:");
-		JLabel label4 = new JLabel("Usertype:");
+//		JLabel label4 = new JLabel("Usertype:");
 
 		JButton CUbutton = new JButton("Create User");
 		CUbutton.addActionListener(this);
@@ -292,8 +292,8 @@ public class Client implements ActionListener {
 		CUcontent.add(label2, c);
 		c.gridy = 2;
 		CUcontent.add(label3, c);
-		c.gridy = 3;
-		CUcontent.add(label4, c);
+//		c.gridy = 3;
+//		CUcontent.add(label4, c);
 
 		c.gridx = 1;
 		c.gridy = 0;
@@ -302,9 +302,9 @@ public class Client implements ActionListener {
 		CUcontent.add(passwordField, c);
 		c.gridy = 2;
 		CUcontent.add(emailField, c);
-		c.gridy = 3;
-		usertypeCombobox.setSelectedIndex(1);
-		CUcontent.add(usertypeCombobox, c);
+//		c.gridy = 3;
+//		usertypeCombobox.setSelectedIndex(1);
+//		CUcontent.add(usertypeCombobox, c);
 
 		c.gridx = 2;
 		c.gridy = 4;
@@ -408,7 +408,8 @@ public class Client implements ActionListener {
 		MPWindow.setResizable(false);
 		MPWindow.setLayout(lm);
 
-		Post[] posts = pm.getPosts(server);
+		logg.info("managePosts session: "+session);
+		Post[] posts = pm.getPosts(server, session);
 		String[] columnNames = { "PostID", "Title", "Author", "Date" };
 
 		postsTable = new JTable(posts.length, columnNames.length);
@@ -447,20 +448,18 @@ public class Client implements ActionListener {
 
 		returnPane.add(MPcontent);
 		return returnPane;
-		// MPWindow.pack();
-		// MPWindow.setLocationRelativeTo(null);
-		// MPWindow.setVisible(true);
 
 	}
 
 	// uppdaterar tabellen med användare
 	private void updatePostsTable() {
-		Post[] posts = pm.getPosts(server);
+		logg.info("updatePosts session: "+session);
+		Post[] posts = pm.getPosts(server, session);
 
 		postsModel.setRowCount(0);
 		for (Post post : posts) {
 			postsModel.addRow(new Object[] { post.getPostId(), post.getTitle(),
-					post.getUserId(),
+					post.getUsername(),
 					dateFormatter.format(post.getDate().getTime()) });
 		}
 	}
@@ -514,7 +513,7 @@ public class Client implements ActionListener {
 
 	// skapar ett fönster och visar alla inlägg
 	private void showPosts() {
-		Post[] posts = pm.getPosts(server);
+		Post[] posts = pm.getPosts(server, session);
 		JFrame postsWindow = new JFrame("test");
 		postsWindow.setLayout(lm);
 		JPanel pane = new JPanel();
@@ -654,6 +653,7 @@ public class Client implements ActionListener {
 		loginWindow.setLayout(lm);
 
 		JButton loginButton = new JButton("Login");
+		JButton newUser = new JButton("Create User");
 
 		JLabel loginLabel1 = new JLabel("Username:");
 		JLabel loginlabel2 = new JLabel("Password:");
@@ -677,9 +677,13 @@ public class Client implements ActionListener {
 		c.anchor = GridBagConstraints.LINE_END;
 		c.gridy = 2;
 		loginContent.add(loginButton, c);
+		c.anchor = GridBagConstraints.LINE_START;
+		loginContent.add(newUser, c);
 
 		loginButton.addActionListener(this);
 		loginButton.setActionCommand("login");
+		newUser.addActionListener(this);
+		newUser.setActionCommand("openCU");
 
 		loginWindow.pack();
 		loginWindow.setLocationRelativeTo(null);
@@ -737,7 +741,7 @@ public class Client implements ActionListener {
 			} else {
 				um.createUser(server, usernameField.getText(),
 						passwordField.getText(), emailField.getText(),
-						usertypeCombobox.getSelectedIndex());
+						1);
 				CUWindow.dispose();
 				usernameField.setText("");
 				passwordField.setText("");
@@ -778,7 +782,7 @@ public class Client implements ActionListener {
 
 		if ("createPost".equals(e.getActionCommand())) {
 			pm.createPost(server, postTitleField.getText(),
-					postTextArea.getText());
+					postTextArea.getText(), sm.getSession(server, session).getUsername());
 			CPWindow.dispose();
 			postTitleField.setText("");
 			postTextArea.setText("");
@@ -816,7 +820,20 @@ public class Client implements ActionListener {
 		if ("login".equals(e.getActionCommand())) {
 			session = login(loginUsername.getText(),
 					loginPassword.getPassword());
-			JOptionPane.showMessageDialog(null, session);
+			logg.info("får en sessionkey: " + session);
+			if (!session.equals("error")) {
+				if (sm.getSession(server, session).getUserType() == 0) {
+					adminView();
+					loginWindow.dispose();
+				} else {
+					userView();
+					loginWindow.dispose();
+					window.setVisible(true);
+				}
+			} else {
+				JOptionPane.showMessageDialog(null,
+						"Wrong username or password!");
+			}
 		}
 
 		if ("showPosts".equals(e.getActionCommand())) {

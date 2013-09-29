@@ -19,7 +19,7 @@ public class Post implements Serializable {
 	private String title;
 	private String text;
 	private Calendar date = Calendar.getInstance();
-	private int userId;
+	private String username;
 
 	public Post() {
 
@@ -57,12 +57,12 @@ public class Post implements Serializable {
 		this.date.setTime(date);
 	}
 
-	public int getUserId() {
-		return userId;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserId(int userId) {
-		this.userId = userId;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 }

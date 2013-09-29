@@ -1,6 +1,6 @@
 package db;
 
-import java.util.UUID;
+import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -10,6 +10,7 @@ import data.Session;
 public class SessionManager {
 
 	private static SessionManager sessionManager = new SessionManager();
+	private static Logger logg = Logger.getLogger("Session Manager");
 
 	private SessionManager() {
 
@@ -22,10 +23,13 @@ public class SessionManager {
 	public void createSession(Session session) {
 		EntityManager em = DatabaseConnection.getEntityManager();
 
+		logg.info("försöker spara session: "+ session);
 		em.getTransaction().begin();
 		try {
 			em.persist(session);
 			em.getTransaction().commit();
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			if (em.getTransaction().isActive())
 				em.getTransaction().rollback();
@@ -33,24 +37,25 @@ public class SessionManager {
 		}
 	}
 
-	public Session getSession(UUID uuid) {
+	public Session getSession(String sessionKey) {
 		EntityManager em = DatabaseConnection.getEntityManager();
 		Session session = null;
-
+		
+		logg.info("söker efter session: "+sessionKey);
 		em.getTransaction().begin();
 		try {
 			TypedQuery<Session> q = em
 					.createQuery(
-							"SELECT Session FROM Session session WHERE session.sessID = :search",
+							"SELECT session FROM Session session WHERE session.sessID = :search",
 							Session.class);
-			q.setParameter("search", uuid).getSingleResult();
+			session = q.setParameter("search", sessionKey).getSingleResult();
 			em.getTransaction().commit();
 		} finally {
 			if (em.getTransaction().isActive())
 				em.getTransaction().rollback();
 			em.close();
 		}
-
+		logg.info("hittat session med sessionKey: "+session);
 		return session;
 	}
 }

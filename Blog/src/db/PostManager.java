@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
-import javax.servlet.ServletContext;
-
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.transport.http.HTTPConstants;
 
 import data.Post;
 
@@ -23,7 +18,7 @@ public class PostManager {
 	public static PostManager getInstance() {
 		return postManager;
 	}
-	
+
 	// sparar ett inlägg i databasen
 	public Post createPost(Post post) {
 		EntityManager em = DatabaseConnection.getEntityManager();
@@ -40,18 +35,17 @@ public class PostManager {
 
 		return post;
 	}
-	
+
 	// editera inlägg
 	public void editPost(int postId, String title, String text) {
 		EntityManager em = DatabaseConnection.getEntityManager();
-		
+
 		em.getTransaction().begin();
 		try {
 			Post post = em.find(Post.class, postId);
 			post.setPostId(postId);
 			post.setTitle(title);
 			post.setText(text);
-			//post.setUserId(userId);
 			em.getTransaction().commit();
 		} finally {
 			if (em.getTransaction().isActive())
@@ -59,7 +53,6 @@ public class PostManager {
 			em.close();
 		}
 	}
-
 
 	// tar bort ett inlägg
 	public void removePost(int postId) {
@@ -78,15 +71,22 @@ public class PostManager {
 	}
 
 	// hämtar alla inlägg
-	public List<Post> getPosts() {
+	public List<Post> getPosts(String username, int userType) {
 		EntityManager em = DatabaseConnection.getEntityManager();
 
 		List<Post> allPosts = new ArrayList<Post>();
 
 		em.getTransaction().begin();
 		try {
-			TypedQuery<Post> q = em.createQuery("SELECT Post FROM Post post",
-					Post.class);
+			TypedQuery<Post> q;
+			if (userType == 0) {
+				q = em.createQuery("SELECT Post FROM Post post", Post.class);
+			} else {
+				q = em.createQuery(
+						"SELECT Post FROM Post post WHERE post.username = :username",
+						Post.class);
+				q.setParameter("username", username);
+			}
 			allPosts = q.getResultList();
 			em.getTransaction().commit();
 		} finally {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import data.Comment;
@@ -27,14 +26,15 @@ public class Core {
 
 	// login metod
 	public String login(String username, String password) {
-		logg.info(username + " " + password);
 		User user = um.searchUser(username);
-		logg.info("stored password: " + user.getPassword()
-				+ "  user password: " + password);
-		if (user.getPassword().equals(password)) {
+		logg.info("user found: " + user);
+		if (user != null && user.getPassword().equals(password)) {
 			Session session = new Session();
-			UUID sessID = session.getSessID();
+			String sessID = session.getSessID();
 			session.setUserType(user.getUsertype());
+			session.setUsername(user.getUsername());
+			session.setLastUse(calendar.getTime());
+			session.setUserId(user.getUserId());
 			sm.createSession(session);
 			return sessID.toString();
 		} else {
@@ -93,26 +93,26 @@ public class Core {
 	public User getUser(int userId) {
 		return um.getUser(userId);
 	}
-	
+
 	// söker efter användare via användarnamn
 	public User searchUser(String username) {
 		return um.searchUser(username);
 	}
 
 	// skapar ett inlägg
-	public void createPost(String title, String text) {
+	public void createPost(String title, String text, String username) {
 		Post post = new Post();
 
 		post.setTitle(title);
 		post.setDate(calendar.getTime());
 		post.setText(text);
-		// post.setUserId(userId);
+		post.setUsername(username);
 
 		pm.createPost(post);
 
 	}
-	
-	//ändrar ett inlägg
+
+	// ändrar ett inlägg
 	public void editPost(int postId, String title, String text) {
 		pm.editPost(postId, title, text);
 	}
@@ -121,25 +121,29 @@ public class Core {
 	public void removePost(int postId) {
 		pm.removePost(postId);
 	}
-	
-	//hämtar ett inlägg
+
+	// hämtar ett inlägg
 	public Post getPost(int postId) {
 		return pm.getPost(postId);
 	}
-	
+
 	// hämtar alla inlägg
-	public List<Post> getPosts() {
+	public List<Post> getPosts(String sessionKey) {
+		logg.info("får getPosts anrop med session: "+sessionKey);
 		List<Post> result = new ArrayList<Post>();
 
-		result = pm.getPosts();
+		Session session = sm.getSession(sessionKey);
+		result = pm.getPosts(session.getUsername(), session.getUserType());
 
 		if (result.isEmpty()) {
 			Post post = new Post();
 			post.setDate(calendar.getTime());
 			post.setTitle("Hello World");
 			post.setText("Welcome to your new blog!");
+			post.setUsername("admin");
 			pm.createPost(post);
-			result = pm.getPosts();
+//			result = pm.getPosts(session.getUserId(), session.getUserType());
+			result.add(post);
 		}
 
 		return result;
@@ -149,7 +153,6 @@ public class Core {
 	public void createComment(String email, String text, String name,
 			Date date, int userID) {
 		Comment comment = new Comment();
-		
 
 		comment.setEmail(email);
 		comment.setName(name);
@@ -159,9 +162,15 @@ public class Core {
 
 		cm.createComment(comment);
 	}
-	
+
 	// tar bort en kommentar
 	public void removeComment(int commentID) {
 		cm.removeComment(commentID);
+	}
+
+	// hämtar en session via sessionkey
+	public Session getSession(String session) {
+		logg.info("får getSession anrop");
+		return sm.getSession(session);
 	}
 }
