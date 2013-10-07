@@ -2,6 +2,7 @@ package db;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -11,6 +12,7 @@ import data.Post;
 public class PostManager {
 
 	private static PostManager postManager = new PostManager();
+	private static Logger logg = Logger.getLogger("postManager");
 
 	private PostManager() {
 	}
@@ -43,7 +45,7 @@ public class PostManager {
 		em.getTransaction().begin();
 		try {
 			Post post = em.find(Post.class, postId);
-			post.setPostId(postId);
+//			logg.info("editerar post: "+post+" med data: "+title+" "+text);
 			post.setTitle(title);
 			post.setText(text);
 			em.getTransaction().commit();
