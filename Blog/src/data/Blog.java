@@ -5,6 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 @Entity
 public class Blog implements Serializable {
 

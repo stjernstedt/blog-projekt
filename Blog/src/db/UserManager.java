@@ -11,6 +11,11 @@ import org.apache.log4j.Logger;
 
 import data.User;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class UserManager {
 
 	private static UserManager userManager = new UserManager();

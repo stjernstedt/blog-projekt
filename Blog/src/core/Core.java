@@ -15,6 +15,11 @@ import db.PostManager;
 import db.SessionManager;
 import db.UserManager;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class Core {
 
 	private Logger logg = Logger.getLogger("Core Logger");

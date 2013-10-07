@@ -9,6 +9,11 @@ import javax.persistence.TypedQuery;
 
 import data.Post;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class PostManager {
 
 	private static PostManager postManager = new PostManager();

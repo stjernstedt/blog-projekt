@@ -8,6 +8,11 @@ import core.CoreStub.GetSession;
 import core.CoreStub.GetSessionResponse;
 import core.CoreStub.Session;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class SessionManager {
 
 	private static Logger logg = Logger.getLogger("sessionManager");

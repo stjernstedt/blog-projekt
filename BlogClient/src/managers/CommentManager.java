@@ -11,8 +11,12 @@ import core.CoreStub.GetCommentsResponse;
 import core.CoreStub.GetPostComments;
 import core.CoreStub.GetPostCommentsResponse;
 import core.CoreStub.RemoveComment;
-import core.CoreStub.RemovePost;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class CommentManager {
 	
 	private static Logger logg = Logger.getLogger("commentManager");

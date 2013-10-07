@@ -9,6 +9,11 @@ import javax.persistence.TypedQuery;
 
 import data.Comment;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class CommentManager {
 
 	private static CommentManager commentManager = new CommentManager();

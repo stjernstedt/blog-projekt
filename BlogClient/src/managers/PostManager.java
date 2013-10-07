@@ -13,6 +13,11 @@ import core.CoreStub.GetPostsResponse;
 import core.CoreStub.Post;
 import core.CoreStub.RemovePost;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class PostManager {
 
 	private static Logger logg = Logger.getLogger("postManager");

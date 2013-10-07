@@ -13,6 +13,11 @@ import core.CoreStub.SearchUser;
 import core.CoreStub.SearchUserResponse;
 import core.CoreStub.User;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class UserManager {
 
 	public User[] getUsers(CoreStub server) {

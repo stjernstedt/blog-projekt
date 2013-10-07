@@ -49,6 +49,11 @@ import core.CoreStub.Post;
 import core.CoreStub.RemoveUser;
 import core.CoreStub.User;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class Client implements ActionListener {
 
 	private Logger logg = Logger.getLogger("Client Logger");

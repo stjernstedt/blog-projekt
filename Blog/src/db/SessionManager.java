@@ -7,6 +7,11 @@ import javax.persistence.TypedQuery;
 
 import data.Session;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 public class SessionManager {
 
 	private static SessionManager sessionManager = new SessionManager();

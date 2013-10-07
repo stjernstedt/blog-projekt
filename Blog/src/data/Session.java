@@ -8,6 +8,11 @@ import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+/**
+ * 
+ * @author Mattias Stjernstedt, Damir Pervan, Johan Trygg
+ *
+ */
 @Entity
 public class Session implements Serializable {
 	
